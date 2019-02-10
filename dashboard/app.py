@@ -9,26 +9,26 @@ import dash
 import dash_core_components as dcc
 import dash_renderer
 import dash_table_experiments as dt
-from dash.dependencies import Input,Output,State
+from dash.dependencies import Input, Output, State
 import json
 import sqlite3
 from flask import Flask
 from scrape_data.queries import *
-app.config['suppress_callback_exceptions']=True
+
+app.config['suppress_callback_exceptions'] = True
 from . import stats_callbacks
 
-#HTML layout for the app.
+# HTML layout for the app.
 plotConfig = {'showLink': False,
               'modeBarButtonsToRemove': ['sendDataToCloud'],
               'displaylogo': False}
 
-countryDropdown = [{'label':'England','value':'england'},
-                   {'label':'France','value':'france'},
-                   {'label':'Germany','value':'germany'},
-                   {'label':'Italy','value':'italy'},
-                   {'label':'Portugal','value':'portugal'},
-                   {'label':'Scotland','value':'scotland'},
-                   {'label':'Spain','value':'spain'}]
+countryDropdown = [{'label': 'England', 'value': 'england'},
+                   {'label': 'France', 'value': 'france'},
+                   {'label': 'Germany', 'value': 'germany'},
+                   {'label': 'Italy', 'value': 'italy'},
+                   {'label': 'Scotland', 'value': 'scotland'},
+                   {'label': 'Spain', 'value': 'spain'}]
 
 tabs_styles = {
     'height': '44px'
@@ -50,20 +50,20 @@ tab_selected_style = {
 # Configure navbar menu
 nav_menu = html.Div([
     html.Ul([
-            html.Li([
-                    dcc.Link('Home', href='/')
-                    ]),
-            html.Li([
-                    dcc.Link('Statistics & Analysis', href='/stats')
-                    ]),
-            html.Li([
-                    dcc.Link('Players', href='/players')
-                    ]),
-            html.Li([
+        html.Li([
+            dcc.Link('Home', href='/')
+        ]),
+        html.Li([
+            dcc.Link('Statistics & Analysis', href='/stats')
+        ]),
+        html.Li([
+            dcc.Link('Player Analysis', href='/players')
+        ]),
+        html.Li([
             dcc.Link('News', href='/news')
-                    ]),
-            html.Img(src=app.get_asset_url('footy_nav.png'), className='topright'),
-            ], className='nav navbar-nav'),
+        ]),
+        html.Img(src=app.get_asset_url('footy_nav.png'), className='topright'),
+    ], className='nav navbar-nav'),
     html.Div(id='page-content'),
 ], className='navbar navbar-inverse navbar-static-top')
 
@@ -72,26 +72,29 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     nav_menu,
     html.Div([
-        #HTML code for the homepage
+        # HTML code for the homepage
         html.Div([
-            html.Img(src=app.get_asset_url('juve.jpg'),className='stadium'),
-            html.H1(children='The Footy Dashboard.', id='h1home'),
+            html.Img(src=app.get_asset_url('juve.jpg'), className='stadium'),
+            html.H1(children='Footy Dash.', id='h1home'),
             html.Blockquote(children='''
-            Welcome to Footy Dash, a Football data visualization website.
-            Data has been curated from all parts of the internet to provide 
-            you with accurate and concise Football information. 
+            Welcome to Footy Dash, a football data visualization website.
+            The data displayed has been curated from various parts of the web, 
+            in order to provide readers accurate and concise Football information. 
+
+            *Under Construction* 
             '''),
             html.Footer(children='Created by Salvatore Architetto: https://github.com/salarchitetto')],
             id='home'),
 
-        #HTML code for stats
-        #add link menu to stats page(I.E = season table per year - shots/goals per year)
-        #add twitter/instagram feed to stats page - columns 1/2
+        # HTML code for stats
+        # add link menu to stats page(I.E = season table per year - shots/goals per year)
+        # add twitter/instagram feed to stats page - columns 1/2
         html.Div([
             html.H2(children='Footy Stats', id='h1stats'),
             html.Div([
                 html.Div([
-                    html.Button(id='win_pct_button', n_clicks=0,children='Show Win PCT for your team.',className='btn btn-primary'),
+                    html.Button(id='win_pct_button', n_clicks=0, children='Show Win PCT for your team.',
+                                className='btn btn-primary'),
                     dcc.Dropdown(id='countries', options=countryDropdown, placeholder='Please select a country.'),
                     dcc.Dropdown(id='indi-teams', placeholder='choose a team', options=[]),
                 ], className='col-xs-2 left-panel'),
@@ -118,16 +121,16 @@ app.layout = html.Div([
 
         ], id='stats'),
 
-        #HTML code for players
+        # HTML code for players
         html.Div([
             html.H1(children='Player Information')
-        ], id = 'players'),
+        ], id='players'),
 
-        #HTML for general news info
+        # HTML for general news info
         html.Div([
             html.H1(children='General News')
-        ], id = 'news'),
-    ], style={'display':'block'}),
+        ], id='news'),
+    ], style={'display': 'block'}),
 
     dcc.Store(id='win_pct_store'),
     # Add bootstrap css
@@ -136,43 +139,47 @@ app.layout = html.Div([
     ]})
 ])
 
-#Adding callbacks for the various links
+
+# Adding callbacks for the various links
 @app.callback(
-    Output(component_id= 'home', component_property='style'),
+    Output(component_id='home', component_property='style'),
     [Input('url', 'pathname')]
 )
 def display_home(pathname):
     if pathname == '/':
-        return {'display':'block'}
+        return {'display': 'block'}
     else:
         return {'display': 'none'}
 
+
 @app.callback(
-    Output(component_id= 'stats', component_property='style'),
+    Output(component_id='stats', component_property='style'),
     [Input('url', 'pathname')]
 )
 def display_stats(pathname):
     if pathname == '/stats':
-        return {'display':'block'}
+        return {'display': 'block'}
     else:
         return {'display': 'none'}
 
+
 @app.callback(
-    Output(component_id= 'players', component_property='style'),
+    Output(component_id='players', component_property='style'),
     [Input('url', 'pathname')]
 )
 def display_players(pathname):
     if pathname == '/players':
-        return {'display':'block'}
+        return {'display': 'block'}
     else:
         return {'display': 'none'}
 
+
 @app.callback(
-    Output(component_id= 'news', component_property='style'),
+    Output(component_id='news', component_property='style'),
     [Input('url', 'pathname')]
 )
 def display_players(pathname):
     if pathname == '/news':
-        return {'display':'block'}
+        return {'display': 'block'}
     else:
         return {'display': 'none'}
