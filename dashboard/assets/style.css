@@ -41,6 +41,7 @@ body {
   min-height: 100vh;
   position: relative;
   margin: 0;
+  overflow-x:hidden;
 
 }
 
@@ -116,15 +117,28 @@ footer {
     vertical-align: middle;
 }
 
-#win_pct_graph {
-    margin-top:50px;
+#seasonlist {
+    font-weight: 200;
+    font-size: 14px;
+    line-height: 12px;
+    margin: 0;
+    padding: 8px;
     position: relative;
-    bottom: 45px;
+    display: inline-block;
+    width:200px;
+    vertical-align: middle;
+}
+
+#win_pct_graph {
+    margin-top:65px;
+    position: relative;
+    bottom: 65px;
 }
 
 #home_win_pct_graph {
+    margin-top: 25px;
     position: relative;
-    bottom: 100px;
+    bottom: 125px;
 }
 
 #loss_win_pct_graph {

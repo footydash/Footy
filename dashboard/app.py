@@ -10,6 +10,7 @@ import dash_core_components as dcc
 import dash_renderer
 import dash_table_experiments as dt
 from dash.dependencies import Input, Output, State
+import dash_table
 import json
 import sqlite3
 from flask import Flask
@@ -27,7 +28,6 @@ countryDropdown = [{'label': 'England', 'value': 'england'},
                    {'label': 'France', 'value': 'france'},
                    {'label': 'Germany', 'value': 'germany'},
                    {'label': 'Italy', 'value': 'italy'},
-                   {'label': 'Scotland', 'value': 'scotland'},
                    {'label': 'Spain', 'value': 'spain'}]
 
 tabs_styles = {
@@ -97,6 +97,10 @@ app.layout = html.Div([
                                 className='btn btn-primary'),
                     dcc.Dropdown(id='countries', options=countryDropdown, placeholder='Please select a country.'),
                     dcc.Dropdown(id='indi-teams', placeholder='choose a team', options=[]),
+                    html.Br(),
+                    html.Button(id='table-button', n_clicks=0, children='Show Win PCT for your team.',
+                                className='btn btn-primary'),
+                    dcc.Dropdown(id='seasonlist', placeholder='choose a season', options=[])
                 ], className='col-xs-2 left-panel'),
                 html.Div([html.Div(className='verticalLine')], className='col-xs-1 left-panel'),
                 dcc.Tabs(id='tabs', children=[
@@ -109,7 +113,8 @@ app.layout = html.Div([
                         ])]),
                     dcc.Tab(label='League Table', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([
-                            html.H1(children='Test')
+                            html.H1(children='Test'),
+                            dash_table.DataTable(id='perseason', columns = ['Team','MP','Wins', 'Losses', "Draws"])
                         ])]),
                     dcc.Tab(label='Stats Table', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([

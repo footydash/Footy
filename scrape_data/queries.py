@@ -12,14 +12,28 @@ def footy_connect(host=eval(os.environ['CONN_CRED'])['host'],
                   passwd=eval(os.environ['CONN_CRED'])['passwd'],
                   dbName=eval(os.environ['CONN_CRED'])['db']):
 
-    footy_connect = MySQLdb.connect(
+    footy_conn = MySQLdb.connect(
         host=host,
         user=user,
         passwd=passwd,
         db=dbName
     )
     print("Conection Made")
-    return footy_connect
+    return footy_conn
+
+def kaggle_connect(host=eval(os.environ['KAGGLE_CRED'])['host'],
+                   user=eval(os.environ['KAGGLE_CRED'])['user'],
+                   passwd=eval(os.environ['KAGGLE_CRED'])['passwd'],
+                   dbName=eval(os.environ['KAGGLE_CRED'])['db']):
+
+    kaggle_conn = MySQLdb.connect(
+        host=host,
+        user=user,
+        passwd=passwd,
+        db=dbName
+    )
+    print('Connection Made')
+    return kaggle_conn
 
 def grab_data(conn, country=None, team_name=None):
     """

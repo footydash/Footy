@@ -62,7 +62,7 @@ def date_conversion(df):
 
     return df
 
-def run_win_pct(team_name):
+def run_win_pct(team_name, country):
     """
     Function that calculates a teams winning percentage Year over Year
     (YoY)
@@ -74,8 +74,7 @@ def run_win_pct(team_name):
     """
     print('working')
 
-    conn = footy_connect()
-    df = grab_data(conn)
+    df = create_seasons_list(country)
 
     df['home_team'] = df['home_team'].str.lower()
     df['away_team'] = df['away_team'].str.lower()
@@ -88,8 +87,8 @@ def run_win_pct(team_name):
     frames = [df_home,df_away]
     df_fill = pd.concat(frames)
 
-    df_fill = home_vs_away(df_fill, team_name)
-    df = date_conversion(df_fill)
+    df = home_vs_away(df_fill, team_name)
+    # df = date_conversion(df_fill)
 
     home_matches = df[df['home_team'] == team_name]
     away_matches = df[df['away_team'] == team_name]
@@ -100,34 +99,34 @@ def run_win_pct(team_name):
     print('calculating pcts')
 
     #wins per season
-    home_team_win = home_matches.groupby(["home_team","date"])["outcome"].apply(
+    home_team_win = home_matches.groupby(["home_team","dateYear"])["outcome"].apply(
         lambda x: x[x.str.contains("win")].count()).reset_index()
-    away_team_win = away_matches.groupby(['away_team','date'])['outcome'].apply(
+    away_team_win = away_matches.groupby(['away_team','dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('win')].count()).reset_index()
 
-    home_team_loss = home_matches.groupby(['home_team','date'])['outcome'].apply(
+    home_team_loss = home_matches.groupby(['home_team','dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('lose')].count()).reset_index()
-    away_team_loss = away_matches.groupby(['away_team','date'])['outcome'].apply(
+    away_team_loss = away_matches.groupby(['away_team','dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('lose')].count()).reset_index()
 
-    home_team_tie = home_matches.groupby(['home_team','date'])['outcome'].apply(
+    home_team_tie = home_matches.groupby(['home_team','dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('draw')].count()).reset_index()
-    away_team_tie = away_matches.groupby(['away_team','date'])['outcome'].apply(
+    away_team_tie = away_matches.groupby(['away_team','dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('draw')].count()).reset_index()
 
     #matches played per season
     searchFor = ['win','lose','draw']
-    matches_home = home_matches.groupby(['home_team','date'])['outcome'].apply(
+    matches_home = home_matches.groupby(['home_team','dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('|'.join(searchFor))].count()).reset_index()
-    matches_away = away_matches.groupby(['away_team', 'date'])['outcome'].apply(
+    matches_away = away_matches.groupby(['away_team', 'dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('|'.join(searchFor))].count()).reset_index()
 
-    match_numbers = matches_home.merge(matches_away, how='left', left_on='date', right_on='date')
+    match_numbers = matches_home.merge(matches_away, how='left', left_on='dateYear', right_on='dateYear')
 
     print('finalizing')
-    loss_merge = home_team_loss.merge(away_team_loss, how='left', left_on='date', right_on='date')
-    tie_merge = home_team_tie.merge(away_team_tie, how='left', left_on='date', right_on='date')
-    fin = home_team_win.merge(away_team_win, how = 'left', left_on='date', right_on='date')
+    loss_merge = home_team_loss.merge(away_team_loss, how='left', left_on='dateYear', right_on='dateYear')
+    tie_merge = home_team_tie.merge(away_team_tie, how='left', left_on='dateYear', right_on='dateYear')
+    fin = home_team_win.merge(away_team_win, how = 'left', left_on='dateYear', right_on='dateYear')
 
     fin['Total Wins'] = fin['outcome_x'] + fin['outcome_y']
     fin['Total Losses'] = loss_merge['outcome_x'] + loss_merge['outcome_y']
@@ -145,11 +144,42 @@ def run_win_pct(team_name):
     fin['Home Loss PCT'] = (home_team_loss['outcome'] / matches_home['outcome'] * 100).round(2)
     fin['Away Loss PCT'] = (away_team_loss['outcome'] / matches_away['outcome'] * 100).round(2)
 
-    conn.close()
-
     return fin
 
-def table_per_season(team_name, years):
+def create_seasons_list(country):
+    """
+
+    :param country:
+    :return:
+    """
+    conn = footy_connect()
+    df = grab_data(conn, country)
+
+    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = df['date'].dt.date
+
+    df['date'] = df['date'].apply(lambda x: x.strftime('%m/%Y'))
+
+    real_dates = []
+    for index, row in df.iterrows():
+        if int(row['date'][:2]) >= 8:
+            year1 = int(row['date'][3:])
+            year2 = year1 + 1
+            real_dates.append(str(year1) + "/" + str(year2))
+        elif int(row['date'][:2]) <= 5:
+            year1 = int(row['date'][3:])
+            year2 = year1 - 1
+            real_dates.append(str(year2) + "/" + str(year1))
+        else:
+            real_dates.append(0)
+
+    df['dateYear'] = real_dates
+    df = df[df['dateYear'] != 0]
+    conn.close()
+
+    return df
+
+def table_per_season(years):
     """
 
     :param team_nam:
@@ -157,13 +187,3 @@ def table_per_season(team_name, years):
     :return:
     """
     pass
-
-def most_goals_per_season(team_name, years):
-    """
-
-    :param team_name:
-    :param years:
-    :return:
-    """
-    pass
-

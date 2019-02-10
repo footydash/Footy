@@ -47,9 +47,10 @@ def populate_teams(country):
 @app.callback(
     Output('win_pct_graph','figure'),
     [Input('win_pct_button','n_clicks')],
-    [State('indi-teams','value')]
+    [State('indi-teams','value'),
+     State('countries','value')]
 )
-def win_pct_graph(n_clicks, team_name):
+def win_pct_graph(n_clicks, team_name, country):
     """
 
     :param df:
@@ -60,13 +61,13 @@ def win_pct_graph(n_clicks, team_name):
     if n_clicks == 0:
         return []
 
-    df = run_win_pct(team_name)
+    df = run_win_pct(team_name, country)
 
-    traces = [go.Scatter(x=df['date'], y=df['Win PCT'], name='Win %',
+    traces = [go.Scatter(x=df['dateYear'], y=df['Win PCT'], name='Win %',
                          line=dict(color=footy_colors('MAASTRICHT BLUE'))),
-              go.Scatter(x=df['date'], y=df['Loss PCT'], name='Loss %',
+              go.Scatter(x=df['dateYear'], y=df['Loss PCT'], name='Loss %',
                          line=dict(color=footy_colors('MIDNIGHT GREEN'))),
-              go.Scatter(x=df['date'], y=df['Draw PCT'], name='Draw %',
+              go.Scatter(x=df['dateYear'], y=df['Draw PCT'], name='Draw %',
                          line=dict(color=footy_colors('ILLUMINATING EMERALD')))]
 
     layout = dict(title=team_name.title() + ' (Win-Tie-Loss) %.',
@@ -77,9 +78,10 @@ def win_pct_graph(n_clicks, team_name):
 @app.callback(
     Output('home_win_pct_graph', 'figure'),
     [Input('win_pct_button','n_clicks')],
-    [State('indi-teams', 'value')]
+    [State('indi-teams', 'value'),
+     State('countries', 'value')]
 )
-def win_home_loss_pct(n_clicks, team_name):
+def win_home_loss_pct(n_clicks, team_name, country):
     """
 
     :param n_clicks:
@@ -89,11 +91,11 @@ def win_home_loss_pct(n_clicks, team_name):
     if n_clicks == 0:
         return []
 
-    df = run_win_pct(team_name)
+    df = run_win_pct(team_name, country)
 
-    traces = [go.Scatter(x=df['date'], y=df['Home Win PCT'], name='Home Win %',
+    traces = [go.Scatter(x=df['dateYear'], y=df['Home Win PCT'], name='Home Win %',
                         line=(dict(color=footy_colors('ILLUMINATING EMERALD')))),
-              go.Scatter(x=df['date'], y=df['Away Win PCT'], name='Away Win %',
+              go.Scatter(x=df['dateYear'], y=df['Away Win PCT'], name='Away Win %',
                          line=dict(color=footy_colors('YANKEES BLUE')))]
     layout = dict(title=team_name.title() + ' Home-Away Win %.',
                   showlegend=True)
@@ -103,9 +105,10 @@ def win_home_loss_pct(n_clicks, team_name):
 @app.callback(
     Output('loss_win_pct_graph', 'figure'),
     [Input('win_pct_button','n_clicks')],
-    [State('indi-teams', 'value')]
+    [State('indi-teams', 'value'),
+     State('countries', 'value')]
 )
-def loss_home_pct(n_clicks, team_name):
+def loss_home_pct(n_clicks, team_name, country):
     """
 
     :param n_clicks:
@@ -115,11 +118,36 @@ def loss_home_pct(n_clicks, team_name):
     if n_clicks == 0:
         return []
 
-    df = run_win_pct(team_name)
+    df = run_win_pct(team_name, country)
 
-    traces = [go.Scatter(x=df['date'], y=df['Home Loss PCT'], name='Home Loss %'),
-              go.Scatter(x=df['date'], y=df['Away Loss PCT'], name='Away Loss %')]
+    traces = [go.Scatter(x=df['dateYear'], y=df['Home Loss PCT'], name='Home Loss %'),
+              go.Scatter(x=df['dateYear'], y=df['Away Loss PCT'], name='Away Loss %')]
     layout = dict(title=team_name.title() + ' Home-Away Loss %',
                   showlegend=True)
 
     return (dict(data=traces, layout=layout))
+
+@app.callback(
+    Output('seasonlist','options'),
+    [Input('countries','value')]
+)
+def season_list(country):
+    """
+
+    :param n_clicks:
+    :param country:
+    :return:
+    """
+    if country is None: return []
+
+    df = create_seasons_list(country)
+    season = list(df['dateYear'].unique())
+    season.sort()
+
+    seasons = []
+
+    for x in range(0, len(season)): seasons.append(
+        dict(label=season[x], value=season[x]
+    ))
+
+    return seasons
