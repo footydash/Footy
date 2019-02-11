@@ -45,12 +45,32 @@ def populate_teams(country):
     return teams
 
 @app.callback(
-    Output('win_pct_graph','figure'),
+    Output('pct_store','data'),
     [Input('win_pct_button','n_clicks')],
     [State('indi-teams','value'),
      State('countries','value')]
 )
-def win_pct_graph(n_clicks, team_name, country):
+def store_pct_data(n_clicks, team_name,country):
+    """
+
+    :param n_clicks:
+    :param team_name:
+    :param country:
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = run_win_pct(team_name, country)
+
+    return df.to_json()
+
+@app.callback(
+    Output('win_pct_graph','figure'),
+    [Input('pct_store','data')],
+    [State('indi-teams','value')]
+)
+def win_pct_graph(data, team_name):
     """
 
     :param df:
@@ -58,10 +78,11 @@ def win_pct_graph(n_clicks, team_name, country):
     :param team_name:
     :return:
     """
-    if n_clicks == 0:
+
+    if data is None:
         return []
 
-    df = run_win_pct(team_name, country)
+    df = pd.read_json(data)
 
     traces = [go.Scatter(x=df['dateYear'], y=df['Win PCT'], name='Win %',
                          line=dict(color=footy_colors('MAASTRICHT BLUE'))),
@@ -77,21 +98,20 @@ def win_pct_graph(n_clicks, team_name, country):
 
 @app.callback(
     Output('home_win_pct_graph', 'figure'),
-    [Input('win_pct_button','n_clicks')],
-    [State('indi-teams', 'value'),
-     State('countries', 'value')]
+    [Input('pct_store','data')],
+    [State('indi-teams', 'value')]
 )
-def win_home_loss_pct(n_clicks, team_name, country):
+def win_home_loss_pct(data, team_name):
     """
 
     :param n_clicks:
     :param team_name:
     :return:
     """
-    if n_clicks == 0:
+    if data is None:
         return []
 
-    df = run_win_pct(team_name, country)
+    df = pd.read_json(data)
 
     traces = [go.Scatter(x=df['dateYear'], y=df['Home Win PCT'], name='Home Win %',
                         line=(dict(color=footy_colors('ILLUMINATING EMERALD')))),
@@ -104,21 +124,20 @@ def win_home_loss_pct(n_clicks, team_name, country):
 
 @app.callback(
     Output('loss_win_pct_graph', 'figure'),
-    [Input('win_pct_button','n_clicks')],
-    [State('indi-teams', 'value'),
-     State('countries', 'value')]
+    [Input('pct_store','data')],
+    [State('indi-teams', 'value')]
 )
-def loss_home_pct(n_clicks, team_name, country):
+def loss_home_pct(data, team_name):
     """
 
     :param n_clicks:
     :param team_name:
     :return:
     """
-    if n_clicks == 0:
+    if data is None:
         return []
 
-    df = run_win_pct(team_name, country)
+    df = pd.read_json(data)
 
     traces = [go.Scatter(x=df['dateYear'], y=df['Home Loss PCT'], name='Home Loss %'),
               go.Scatter(x=df['dateYear'], y=df['Away Loss PCT'], name='Away Loss %')]

@@ -137,7 +137,7 @@ app.layout = html.Div([
         ], id='news'),
     ], style={'display': 'block'}),
 
-    dcc.Store(id='win_pct_store'),
+    dcc.Store(id='pct_store'),
     # Add bootstrap css
     app.css.append_css({"external_url": [
         "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
