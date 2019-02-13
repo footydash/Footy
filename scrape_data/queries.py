@@ -35,7 +35,7 @@ def kaggle_connect(host=eval(os.environ['KAGGLE_CRED'])['host'],
     print('Connection Made')
     return kaggle_conn
 
-def grab_data(conn, country=None, team_name=None):
+def grab_data(conn, country=None, team_name=None, division=None):
     """
 
     :param conn: connection used to get into footy db
@@ -45,7 +45,7 @@ def grab_data(conn, country=None, team_name=None):
     matches = """
 
         SELECT *
-        FROM footy_matches
+        FROM footy_data
         WHERE home_team != '0'
     """
     if country is not None:
@@ -55,7 +55,7 @@ def grab_data(conn, country=None, team_name=None):
 
     return df
 
-def grab_team_names(conn, country=None):
+def grab_team_names(conn, country=None, division=None):
     """
 
     :param conn:
@@ -64,7 +64,7 @@ def grab_team_names(conn, country=None):
     """
     names = """
         SELECT DISTINCT home_team
-        FROM footy_matches
+        FROM footy_data
         WHERE home_team != '0'
      """
 

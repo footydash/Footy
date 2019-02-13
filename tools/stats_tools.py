@@ -70,7 +70,7 @@ def run_win_pct(team_name, country):
         number of wins by the total number of competitions.
         Then multiply by 100 = win percentage.
     :param team_name: Takes in the state of the team_names dropdown
-    :return:a dataframe That returns winning percentages for specific teams
+    :return:a dataframe That returns percentages for specific teams
     """
     print('working')
 
@@ -121,6 +121,8 @@ def run_win_pct(team_name, country):
     matches_away = away_matches.groupby(['away_team', 'dateYear'])['outcome'].apply(
         lambda x: x[x.str.contains('|'.join(searchFor))].count()).reset_index()
 
+    #goals for and against
+
     match_numbers = matches_home.merge(matches_away, how='left', left_on='dateYear', right_on='dateYear')
 
     print('finalizing')
@@ -155,19 +157,23 @@ def create_seasons_list(country):
     conn = footy_connect()
     df = grab_data(conn, country)
 
-    df['date'] = pd.to_datetime(df['date'])
-    df['date'] = df['date'].dt.date
-
-    df['date'] = df['date'].apply(lambda x: x.strftime('%m/%Y'))
+    # df['dates'] = pd.to_datetime(df['dates'])
+    # df['dates'] = df['dates'].dt.date
+    #
+    # df['dates'] = df['dates'].apply(lambda x: x.strftime('%d/%m/%Y'))
 
     real_dates = []
+    import re
+    m = '\d+'
     for index, row in df.iterrows():
-        if int(row['date'][:2]) >= 8:
-            year1 = int(row['date'][3:])
+        x = re.findall(m, row['dates'])
+        x = int(x[1])
+        if x >= 8:
+            year1 = int(row['dates'][-2:]) + 2000
             year2 = year1 + 1
             real_dates.append(str(year1) + "/" + str(year2))
-        elif int(row['date'][:2]) <= 5:
-            year1 = int(row['date'][3:])
+        elif x <= 5:
+            year1 = int(row['dates'][-2:]) + 2000
             year2 = year1 - 1
             real_dates.append(str(year2) + "/" + str(year1))
         else:
@@ -179,11 +185,20 @@ def create_seasons_list(country):
 
     return df
 
-def table_per_season(years):
+def table_per_season(country,year):
     """
 
     :param team_nam:
     :param years:
     :return:
     """
+
+    df = create_seasons_list(country)
+    df = df[df['dateYear'] == year]
+
+    final = pd.DataFrame()
+
+
+
+
     pass
