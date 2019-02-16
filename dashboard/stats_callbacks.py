@@ -8,6 +8,8 @@ from scrape_data.queries import *
 from tools.stats_tools import *
 import plotly.graph_objs as go
 from tools.footy_tools import *
+import dash_html_components as html
+import dash_table
 
 
 try:
@@ -24,20 +26,23 @@ legendConfig = dict(orientation='h', x=0, y=1.1)
 
 @app.callback(
     Output('indi-teams','options'),
-    [Input('countries', 'value')]
+    [Input('divisions', 'value')],
+    [State('countries', 'value')]
 )
-def populate_teams(country):
+def populate_teams(country, division):
     """
 
-    :param countries:
+    :param country:
+    :param division:
     :return:
     """
     if country is None: return []
 
-    team_names = choose_team(country)
+    team_names = choose_team(country, division)
 
     teams = []
 
+    print(teams)
     for x in range(0, len(team_names)): teams.append(
         dict(label=team_names['home_team'][x], value=team_names['home_team'][x].lower()
     ))
@@ -179,3 +184,50 @@ def season_list(country):
     ))
 
     return seasons
+
+@app.callback(
+    Output('divisions', 'options'),
+    [Input('countries', 'value')]
+)
+
+def division_list(country):
+    """
+
+    :param country:
+    :return:
+    """
+    if country is None: return []
+
+    conn = footy_connect()
+    divisions = grab_divisions(conn, country)
+
+    divs = []
+
+    for x in range(0, len(divisions)): divs.append(
+        dict(label=divisions['division'][x], value=divisions['division'][x]
+    ))
+
+    return divs
+
+@app.callback(
+    Output('perseason','data'),
+    [Input('table-button','n_clicks')],
+    [State('countries','value'),
+     State('divisions', 'value'),
+     State('seasonlist', 'value')]
+)
+def show_league_tables(n_clicks, country, division, season):
+    """
+
+    :param n_clicks:
+    :param country:
+    :param division:
+    :param season:
+    :return:
+    """
+    if n_clicks == 0:
+        return [{}]
+
+    df = table_per_season(country, division, season)
+
+    return df.to_dict(orient='records')

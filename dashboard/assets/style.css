@@ -129,6 +129,18 @@ footer {
     vertical-align: middle;
 }
 
+#divisions {
+    font-weight: 200;
+    font-size: 14px;
+    line-height: 12px;
+    margin: 0;
+    padding: 8px;
+    position: relative;
+    display: inline-block;
+    width:200px;
+    vertical-align: middle;
+}
+
 #win_pct_graph {
     margin-top:65px;
     position: relative;
@@ -146,10 +158,10 @@ footer {
     bottom: 150px;
 }
 
-._dash-undo-redo {
-  display: none;
+#perseason{
+    width:1300px;
 }
 
-#home{
-
+._dash-undo-redo {
+  display: none;
 }

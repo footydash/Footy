@@ -1,10 +1,11 @@
 import os
 import pandas as pd
+import numpy as np
 from collections import *
 from scrape_data.queries import *
 from scrape_data.mysql_connect import *
 
-def choose_team(country_name):
+def choose_team(country_name, division):
     """
     This function returns a list of the teams per country and will
     populate a drop down in the callbacks
@@ -15,7 +16,7 @@ def choose_team(country_name):
     conn = footy_connect()
 
     #grabbing dataframe
-    df = grab_team_names(conn, country_name)
+    df = grab_team_names(conn, country_name, division)
 
     conn.close()
 
@@ -88,7 +89,6 @@ def run_win_pct(team_name, country):
     df_fill = pd.concat(frames)
 
     df = home_vs_away(df_fill, team_name)
-    # df = date_conversion(df_fill)
 
     home_matches = df[df['home_team'] == team_name]
     away_matches = df[df['away_team'] == team_name]
@@ -157,11 +157,6 @@ def create_seasons_list(country):
     conn = footy_connect()
     df = grab_data(conn, country)
 
-    # df['dates'] = pd.to_datetime(df['dates'])
-    # df['dates'] = df['dates'].dt.date
-    #
-    # df['dates'] = df['dates'].apply(lambda x: x.strftime('%d/%m/%Y'))
-
     real_dates = []
     import re
     m = '\d+'
@@ -185,7 +180,7 @@ def create_seasons_list(country):
 
     return df
 
-def table_per_season(country,year):
+def table_per_season(country, division, year):
     """
 
     :param team_nam:
@@ -195,10 +190,42 @@ def table_per_season(country,year):
 
     df = create_seasons_list(country)
     df = df[df['dateYear'] == year]
+    df = df[df['division'] == division]
 
+    #creating empty dataframe
     final = pd.DataFrame()
 
+    #matches played
+    mp_home = df.groupby(['home_team'])['id'].count().reset_index()
+    mp_away = df.groupby(['away_team'])['id'].count().reset_index()
 
+    #resutls
+    w_home = df.groupby(['home_team'])['full_time_results'].apply(lambda x: x[x.str.contains('H')].count()).reset_index()
+    w_away = df.groupby(['away_team'])['full_time_results'].apply(lambda x: x[x.str.contains('A')].count()).reset_index()
 
+    l_home = df.groupby(['home_team'])['full_time_results'].apply(lambda x: x[x.str.contains('A')].count()).reset_index()
+    l_away = df.groupby(['away_team'])['full_time_results'].apply(lambda x: x[x.str.contains('H')].count()).reset_index()
 
-    pass
+    d_home = df.groupby(['home_team'])['full_time_results'].apply(lambda x: x[x.str.contains('D')].count()).reset_index()
+    d_away = df.groupby(['away_team'])['full_time_results'].apply(lambda x: x[x.str.contains('D')].count()).reset_index()
+
+    #gf/ga
+    gf_home = df.groupby(['home_team'])['home_team_goals'].sum().reset_index()
+    gf_away = df.groupby(['away_team'])['away_team_goals'].sum().reset_index()
+
+    gfh = df.groupby(['home_team'])['away_team_goals'].sum().reset_index()
+    gfa = df.groupby(['away_team'])['home_team_goals'].sum().reset_index()
+
+    #calcs
+    final['Team'] = mp_home['home_team']
+    final['MP'] = mp_home['id'] + mp_away['id']
+    final['W'] = w_home['full_time_results'] + w_away['full_time_results']
+    final['D'] = d_home['full_time_results'] + d_away['full_time_results']
+    final["L"] = l_home['full_time_results'] + l_away['full_time_results']
+    final['GF'] = gf_home['home_team_goals'] + gf_away['away_team_goals']
+    final['GA'] = gfa['home_team_goals'] + gfh['away_team_goals']
+    final['+/-'] = final['GF'] - final['GA']
+    final['PTS'] = (final['W'] * 3) + (final['D'] * 1)
+    final = final.sort_values(by='PTS', ascending=False)
+
+    return final

@@ -96,9 +96,10 @@ app.layout = html.Div([
                     html.Button(id='win_pct_button', n_clicks=0, children='Show Win PCT for your team.',
                                 className='btn btn-primary'),
                     dcc.Dropdown(id='countries', options=countryDropdown, placeholder='Please select a country.'),
+                    dcc.Dropdown(id='divisions', placeholder='Choose a division', options =[]),
                     dcc.Dropdown(id='indi-teams', placeholder='choose a team', options=[]),
                     html.Br(),
-                    html.Button(id='table-button', n_clicks=0, children='Show Win PCT for your team.',
+                    html.Button(id='table-button', n_clicks=0, children='Display table for specific year.',
                                 className='btn btn-primary'),
                     dcc.Dropdown(id='seasonlist', placeholder='choose a season', options=[])
                 ], className='col-xs-2 left-panel'),
@@ -113,9 +114,31 @@ app.layout = html.Div([
                         ])]),
                     dcc.Tab(label='League Table', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([
-                            html.H1(children='Test'),
-                            dash_table.DataTable(id='perseason', columns = ['Team','MP','Wins', 'Losses', "Draws"])
-                        ])]),
+                            html.Br(),
+                            dash_table.DataTable(id='perseason',columns=[
+                                {'name': 'Team', 'id':'Team'},
+                                {'name': 'MP', 'id':'MP'},
+                                {'name': 'W', 'id':'W'},
+                                {'name': 'D', 'id': 'D'},
+                                {'name': 'L', 'id': 'L'},
+                                {'name': 'GF', 'id': 'GF'},
+                                {'name': 'GA', 'id': 'GA'},
+                                {'name': '+/-', 'id': '+/-'},
+                                {'name': 'PTS', 'id': 'PTS'}
+                                ], data=[],
+                            style_as_list_view=True,
+                            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+                             style_cell={'backgroundColor': 'rgb(30, 30, 30)',
+                                     'padding': '5px',
+                                     'color': 'white'},
+                             style_cell_conditional=[
+                                 {'if': {'column_id': 'Team'},
+                                  'width': '10%'},
+                                 {'if': {'column_id': 'PTS'},
+                                  'width': '10%'}
+                             ])
+                        ])
+                    ]),
                     dcc.Tab(label='Stats Table', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([
                             html.H1(children='Stat Creation')

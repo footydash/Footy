@@ -55,7 +55,7 @@ def grab_data(conn, country=None, team_name=None, division=None):
 
     return df
 
-def grab_team_names(conn, country=None, division=None):
+def grab_team_names(conn, division=None, country=None):
     """
 
     :param conn:
@@ -65,14 +65,34 @@ def grab_team_names(conn, country=None, division=None):
     names = """
         SELECT DISTINCT home_team
         FROM footy_data
-        WHERE home_team != '0'
      """
 
     if country is not None:
-        names = names + "AND country IN ('" + str(country) + "')"
+        names = names + "WHERE division IN ('" + str(division) + "')"
+
+    if division is not None:
+        names = names + " AND country IN ('" + str(country) + "')"
+
     names = names + " ORDER BY home_team ASC"
 
     df = pd.read_sql(names, conn)
+
+    return df
+
+def grab_divisions(conn, country=None):
+
+    division = """
+    
+        SELECT DISTINCT division
+        FROM footy_data
+    """
+
+    if country is not None:
+        division = division + " WHERE country IN ('" + str(country) + "')"
+
+    division = division + " ORDER BY division ASC"
+
+    df = pd.read_sql_query(division, conn)
 
     return df
 
