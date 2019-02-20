@@ -85,7 +85,7 @@ def win_pct_graph(data, team_name, n_clicks):
     :return:
     """
     if n_clicks == 0:
-        return []
+        return {'display':'none'}
 
     df = pd.read_json(data)
     df = df.sort_values(by='dateYear', ascending=True)
@@ -100,7 +100,10 @@ def win_pct_graph(data, team_name, n_clicks):
 
     layout = dict(title=team_name.title() + ' (Win-Tie-Loss) %.',
                   showlegend = True,
-                  xaxis=dict(tickvals=df.dateYear, ticktext=df.dateYear))
+                  xaxis=dict(tickvals=df.dateYear, ticktext=df.dateYear),
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE'
+                  )
 
     return (dict(data=traces, layout = layout))
 
@@ -129,9 +132,13 @@ def win_home_loss_pct(data, team_name, n_clicks):
               go.Scatter(x=df['dateYear'], y=df['Away Win PCT'], name='Away Win %',
                          line=dict(color=footy_colors('YANKEES BLUE')))]
     layout = dict(title=team_name.title() + ' Home-Away Win %.',
-                  showlegend=True)
+                  showlegend=True,
+                    paper_bgcolor = '#EEEEEE',
+                    plot_bgcolor = '#EEEEEE'
+    )
 
     return (dict(data=traces, layout=layout))
+
 
 @app.callback(
     Output('loss_win_pct_graph', 'figure'),
@@ -156,7 +163,10 @@ def loss_home_pct(data, team_name, n_clicks):
     traces = [go.Scatter(x=df['dateYear'], y=df['Home Loss PCT'], name='Home Loss %'),
               go.Scatter(x=df['dateYear'], y=df['Away Loss PCT'], name='Away Loss %')]
     layout = dict(title=team_name.title() + ' Home-Away Loss %',
-                  showlegend=True)
+                  showlegend=True,
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE'
+                  )
 
     return (dict(data=traces, layout=layout))
 
@@ -208,6 +218,27 @@ def division_list(country):
     ))
 
     return divs
+
+@app.callback(
+    Output('table-name','children'),
+    [Input('seasonlist', 'value')],
+    [State('divisions', 'value')]
+)
+def table_name(season, division):
+    """
+
+    :param n_clicks:
+    :param division:
+    :param season:
+    :return:
+    """
+
+    if season is None:
+        return str('Please enter a League and Table Year!')
+    else:
+        return str(division) + " Table for the Season of " + str(season)
+
+    # return str(table)
 
 @app.callback(
     Output('perseason','data'),

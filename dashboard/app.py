@@ -34,9 +34,10 @@ tabs_styles = {
     'height': '44px'
 }
 tab_style = {
-    'borderBottom': '1px solid #d6d6d6',
+    'borderBottom': '1px solid #D2D2D2',
     'padding': '6px',
-    'fontWeight': 'bold'
+    'fontWeight': 'bold',
+    'backgroundColor': '#D2D2D2'
 }
 
 tab_selected_style = {
@@ -45,6 +46,10 @@ tab_selected_style = {
     'backgroundColor': 'black',
     'color': 'white',
     'padding': '6px'
+}
+
+colors = {
+    'background': 'black'
 }
 
 # Configure navbar menu
@@ -90,10 +95,11 @@ app.layout = html.Div([
         # add link menu to stats page(I.E = season table per year - shots/goals per year)
         # add twitter/instagram feed to stats page - columns 1/2
         html.Div([
-            html.H2(children='Footy Stats', id='h1stats'),
             html.Div([
+                # html.Br(),
                 html.Div([
-                    html.Button(id='win_pct_button', n_clicks=0, children='Show Win PCT for your team.',
+                    html.P(children='Choose Criteria Here!', id='h4stats'),
+                    html.Button(id='win_pct_button', n_clicks=0, children='Show win-tie-loss % for your team.',
                                 className='btn btn-primary'),
                     dcc.Dropdown(id='countries', options=countryDropdown, placeholder='Please select a country.'),
                     dcc.Dropdown(id='divisions', placeholder='Choose a division', options =[]),
@@ -102,9 +108,13 @@ app.layout = html.Div([
                     html.Button(id='table-button', n_clicks=0, children='Display table for specific year.',
                                 className='btn btn-primary'),
                     dcc.Dropdown(id='seasonlist', placeholder='choose a season', options=[])
-                ], className='col-xs-2 left-panel'),
-                html.Div([html.Div(className='verticalLine')], className='col-xs-1 left-panel'),
+                ], className='col-xs-2 left-panel', id='test'),
+                # html.Div([html.Div(className='verticalLine')], className='col-xs-1 left-panel'),
+                html.Br(),
                 dcc.Tabs(id='tabs', children=[
+                    dcc.Tab(label='Live Scores', style=tab_style,selected_style=tab_selected_style, children=[
+                        html.H1(children='Coming Soon')
+                    ]),
                     dcc.Tab(label='Win/Loss PCT', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([
                             dcc.Graph(id='win_pct_graph', config=plotConfig, style={'height': '50vh'}),
@@ -115,28 +125,50 @@ app.layout = html.Div([
                     dcc.Tab(label='League Table', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([
                             html.Br(),
-                            dash_table.DataTable(id='perseason',columns=[
-                                {'name': 'Team', 'id':'Team'},
-                                {'name': 'MP', 'id':'MP'},
-                                {'name': 'W', 'id':'W'},
-                                {'name': 'D', 'id': 'D'},
-                                {'name': 'L', 'id': 'L'},
-                                {'name': 'GF', 'id': 'GF'},
-                                {'name': 'GA', 'id': 'GA'},
-                                {'name': '+/-', 'id': '+/-'},
-                                {'name': 'PTS', 'id': 'PTS'}
-                                ], data=[],
-                            style_as_list_view=True,
-                            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
-                             style_cell={'backgroundColor': 'rgb(30, 30, 30)',
-                                     'padding': '5px',
-                                     'color': 'white'},
-                             style_cell_conditional=[
-                                 {'if': {'column_id': 'Team'},
-                                  'width': '10%'},
-                                 {'if': {'column_id': 'PTS'},
-                                  'width': '10%'}
-                             ])
+                            html.H2(id='table-name', children=[]),
+                            html.Div(
+                                dash_table.DataTable(id='perseason',columns=[
+                                    {'name': 'Team', 'id':'Team'},
+                                    {'name': 'MP', 'id':'MP'},
+                                    {'name': 'W', 'id':'W'},
+                                    {'name': 'D', 'id': 'D'},
+                                    {'name': 'L', 'id': 'L'},
+                                    {'name': 'GF', 'id': 'GF'},
+                                    {'name': 'GA', 'id': 'GA'},
+                                    {'name': '+/-', 'id': '+/-'},
+                                    {'name': 'PTS', 'id': 'PTS'}
+                                    ], data=[],
+                                style_as_list_view=True,
+                                # style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+                                 style_cell={'backgroundColor': 'rgb(30, 30, 30)',
+                                         'padding': '5px',
+                                         'color': 'white',
+                                         'whiteSpace':'no-wrap',
+                                         'maxWidth':0,},
+                                 style_cell_conditional=[
+                                     {'if': {'column_id': 'Team'},
+                                      'width': '3%'},
+                                     {'if': {'column_id': 'PTS'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': 'MP'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': 'W'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': 'D'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': 'L'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': 'GF'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': 'GA'},
+                                      'width': '2%'},
+                                     {'if': {'column_id': '+/-'},
+                                      'width': '2%'},
+
+                                 ],
+                                 sorting=True,
+                                 sorting_type="multi",
+                                 ),id='div-table')
                         ])
                     ]),
                     dcc.Tab(label='Stats Table', style=tab_style, selected_style=tab_selected_style, children=[
@@ -145,7 +177,7 @@ app.layout = html.Div([
                         ])
                     ]),
                 ], className="col-xs-9 right-panel", style=tabs_styles)
-            ], className='row'),
+            ], className='row', id='test2'),
 
         ], id='stats'),
 

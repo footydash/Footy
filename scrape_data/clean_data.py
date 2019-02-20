@@ -17,7 +17,7 @@ def read_dir(directory):
 
     return file_path
 
-def remove_null_values(csv, country):
+def remove_null_values(csv, country, division):
     """
     Function to remove all '' (empty data) from csv
     :param csv: directory pointer to csv
@@ -36,8 +36,9 @@ def remove_null_values(csv, country):
         modified_csv = read_csv.fillna(0)
 
         modified_csv["country"] = country
-
+        modified_csv["division"] = division
         check = modified_csv.isnull().sum().sum()
+
         print(check)
 
         if check > 0:
