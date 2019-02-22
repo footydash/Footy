@@ -21,7 +21,8 @@ except:
 
 plotConfig = {'showLink': False,
               'modeBarButtonsToRemove': ['sendDataToCloud'],
-              'displaylogo': False}
+              'displaylogo': False,
+              'backgroundColor': 'green'}
 legendConfig = dict(orientation='h', x=0, y=1.1)
 
 @app.callback(
@@ -89,7 +90,6 @@ def win_pct_graph(data, team_name, n_clicks):
 
     df = pd.read_json(data)
     df = df.sort_values(by='dateYear', ascending=True)
-    # df = df.iloc[1:]
 
     traces = [go.Scatter(x=df['dateYear'], y=df['Win PCT'], name='Win %',
                          line=dict(color=footy_colors('MAASTRICHT BLUE'))),
@@ -101,8 +101,8 @@ def win_pct_graph(data, team_name, n_clicks):
     layout = dict(title=team_name.title() + ' (Win-Tie-Loss) %.',
                   showlegend = True,
                   xaxis=dict(tickvals=df.dateYear, ticktext=df.dateYear),
-                  paper_bgcolor='#EEEEEE',
-                  plot_bgcolor='#EEEEEE'
+                  paper_bgcolor='rgba(0,0,0,0)',
+                  plot_bgcolor='rgba(0,0,0,0)'
                   )
 
     return (dict(data=traces, layout = layout))
@@ -125,7 +125,6 @@ def win_home_loss_pct(data, team_name, n_clicks):
 
     df = pd.read_json(data)
     df = df.sort_values(by='dateYear', ascending=True)
-    # df = df.iloc[1:]
 
     traces = [go.Scatter(x=df['dateYear'], y=df['Home Win PCT'], name='Home Win %',
                         line=(dict(color=footy_colors('ILLUMINATING EMERALD')))),
@@ -158,7 +157,6 @@ def loss_home_pct(data, team_name, n_clicks):
 
     df = pd.read_json(data)
     df = df.sort_values(by='dateYear', ascending=True)
-    # df = df.iloc[1:]
 
     traces = [go.Scatter(x=df['dateYear'], y=df['Home Loss PCT'], name='Home Loss %'),
               go.Scatter(x=df['dateYear'], y=df['Away Loss PCT'], name='Away Loss %')]
@@ -238,7 +236,6 @@ def table_name(season, division):
     else:
         return str(division) + " Table for the Season of " + str(season)
 
-    # return str(table)
 
 @app.callback(
     Output('perseason','data'),

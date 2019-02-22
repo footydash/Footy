@@ -24,12 +24,12 @@ def choose_team(country_name, division):
 
 def home_vs_away(df, team_name):
     """
+    Helper function to check out wins loses and draws for a given team.
 
     :param df: dataframe containing information to determine home or
     away wins
     :return: df
     """
-
 
     outcome = []
     for index, row in df.iterrows():
@@ -48,28 +48,18 @@ def home_vs_away(df, team_name):
 
     return df
 
-def date_conversion(df):
-    """
-    converting date column into datetime values as it is
-    only a list of strings.
-    :param df: dataframe to manipulate
-    :return: datatrame
-    """
-    #changing dataframe series to datetime column
-    df['date'] = pd.to_datetime(df['date'])
-
-    #converting dates to years
-    df['date'] = df['date'].dt.year
-
-    return df
-
 def run_win_pct(team_name, country):
     """
-    Function that calculates a teams winning percentage Year over Year
-    (YoY)
+    Function that calculates a teams winning percentage Year over Year (YoY)
     Calculation:
-        number of wins by the total number of competitions.
+        Number of wins by the total number of competitions.
         Then multiply by 100 = win percentage.
+        Number of loses by the total number of competitions.
+        Then multiply by 100 = loss percentage
+
+        this function also takes into account the home and away win/loss
+        percentages.
+
     :param team_name: Takes in the state of the team_names dropdown
     :return:a dataframe That returns percentages for specific teams
     """
@@ -150,9 +140,12 @@ def run_win_pct(team_name, country):
 
 def create_seasons_list(country):
     """
+    This function pretty much breaks down the date of a given match
+    then buckets that information to a particular season. I.E: a match played
+    on 02/07/2018 would be bucketed in the 2017/2018 season.
 
-    :param country:
-    :return:
+    :param country: a chosen country from the dropdown
+    :return: a dataframe
     """
     conn = footy_connect()
     df = grab_data(conn, country)
@@ -182,10 +175,15 @@ def create_seasons_list(country):
 
 def table_per_season(country, division, year):
     """
+    Function that returns a complete dataframe with what you would normally
+    see as a soccer league table. It contains the matches played, wins, draws,
+    loses, goals for/against,  the difference, and the overall points a team
+    earned throughout the season.
 
-    :param team_nam:
-    :param years:
-    :return:
+    :param country: an option from the countries dropdown
+    :param division: an option from the divsions dropdown
+    :param year: an option from the seasons dropdown
+    :return: a dataframe with the information for a specific season
     """
 
     df = create_seasons_list(country)
@@ -229,3 +227,16 @@ def table_per_season(country, division, year):
     final = final.sort_values(by='PTS', ascending=False)
 
     return final
+
+def stat_creation(country, division, team):
+    """
+
+
+
+    :param country:
+    :param division:
+    :param team:
+    :return:
+    """
+
+    pass
