@@ -94,15 +94,15 @@ def win_pct_graph(data, team_name, n_clicks):
     traces = [go.Scatter(x=df['dateYear'], y=df['Win PCT'], name='Win %',
                          line=dict(color=footy_colors('MAASTRICHT BLUE'))),
               go.Scatter(x=df['dateYear'], y=df['Loss PCT'], name='Loss %',
-                         line=dict(color=footy_colors('MIDNIGHT GREEN'))),
+                         line=dict(color=footy_colors('INDEPENDENCE'))),
               go.Scatter(x=df['dateYear'], y=df['Draw PCT'], name='Draw %',
                          line=dict(color=footy_colors('ILLUMINATING EMERALD')))]
 
     layout = dict(title=team_name.title() + ' (Win-Tie-Loss) %.',
                   showlegend = True,
                   xaxis=dict(tickvals=df.dateYear, ticktext=df.dateYear),
-                  paper_bgcolor='rgba(0,0,0,0)',
-                  plot_bgcolor='rgba(0,0,0,0)'
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE'
                   )
 
     return (dict(data=traces, layout = layout))
@@ -158,8 +158,10 @@ def loss_home_pct(data, team_name, n_clicks):
     df = pd.read_json(data)
     df = df.sort_values(by='dateYear', ascending=True)
 
-    traces = [go.Scatter(x=df['dateYear'], y=df['Home Loss PCT'], name='Home Loss %'),
-              go.Scatter(x=df['dateYear'], y=df['Away Loss PCT'], name='Away Loss %')]
+    traces = [go.Scatter(x=df['dateYear'], y=df['Home Loss PCT'], name='Home Loss %',
+                         line=(dict(color=footy_colors('ILLUMINATING EMERALD')))),
+              go.Scatter(x=df['dateYear'], y=df['Away Loss PCT'], name='Away Loss %',
+                         line=dict(color=footy_colors('YANKEES BLUE')))]
     layout = dict(title=team_name.title() + ' Home-Away Loss %',
                   showlegend=True,
                   paper_bgcolor='#EEEEEE',
@@ -259,3 +261,129 @@ def show_league_tables(n_clicks, country, division, season):
     df = table_per_season(country, division, season)
 
     return df.to_dict(orient='records')
+
+@app.callback(
+    Output('team_stats', 'data'),
+    [Input('win_pct_button', 'n_clicks')],
+    [State('countries', 'value')]
+)
+def store_team_pct(n_clicks, country):
+    """
+
+    :param n_clicks:
+    :param country:
+    :return:
+    """
+
+    if n_clicks == 0:
+        return []
+
+    df = store_team_data(country)
+
+    return df.to_json()
+
+
+@app.callback(
+    Output('goals-scored', 'figure'),
+    [Input('team_stats', 'data')],
+    [State('win_pct_button', 'n_clicks'),
+     State('divisions', 'value'),
+     State('indi-teams', 'value')]
+)
+def goal_pct(data, n_clicks, division, team):
+    """
+
+    :param n_clicks:
+    :param data:
+    :param division:
+    :param team:
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = pd.read_json(data)
+    df = goal_stats(df, division, team)
+
+    overall_pct = go.Bar(
+        x=df['season'],
+        y=df['overall_pct'],
+        marker=dict(color=footy_colors('MAASTRICHT BLUE')),
+        name='Overall PCT'
+    )
+
+    home_pct = go.Bar(
+        x=df['season'],
+        y=df['home_pct'],
+        marker=dict(color=footy_colors('MIDNIGHT GREEN')),
+        name='Home PCT'
+    )
+
+    away_pct = go.Bar(
+        x=df['season'],
+        y=df['away_pct'],
+        marker=dict(color=footy_colors('ILLUMINATING EMERALD')),
+        name='Away PCT'
+    )
+    data = [overall_pct, home_pct, away_pct]
+
+    layout = dict(title= team.title() + ' Goal PCTs (Overall-Home-Away)',
+                  showlegend=True,
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE',
+                  xaxis=dict(tickangle=45))
+
+    return dict(data=data, layout=layout)
+
+@app.callback(
+    Output('shot-stats', 'figure'),
+    [Input('team_stats', 'data')],
+    [State('divisions', 'value'),
+     State('indi-teams', 'value'),
+     State('win_pct_button', 'n_clicks')]
+)
+def shot_data(data, division, team, n_clicks):
+    """
+
+    :param data:
+    :param division:
+    :param team:
+    :param n_clicks:
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = pd.read_json(data)
+    df = shot_stats(df, division, team)
+
+    overall_pct = go.Bar(
+        x=df['season'],
+        y=df['overall_pct'],
+        marker=dict(color=footy_colors('MAASTRICHT BLUE')),
+        name='Overall Shot PCT'
+    )
+
+    home_pct = go.Bar(
+        x=df['season'],
+        y=df['home_pct'],
+        marker=dict(color=footy_colors('MAASTRICHT BLUE')),
+        name='Home Shot PCT'
+    )
+
+    away_pct = go.Bar(
+        x=df['season'],
+        y=df['away_pct'],
+        marker=dict(color=footy_colors('ILLUMINATING EMERALD')),
+        name='Away Shot PCT'
+    )
+    data = [home_pct, away_pct]
+
+    layout = dict(title= team.title() + ' Shots on Target PCTs (Home-Away)',
+                  showlegend=True,
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE',
+                  xaxis=dict(tickangle=45))
+
+    return dict(data=data, layout=layout)
+

@@ -228,9 +228,21 @@ def table_per_season(country, division, year):
 
     return final
 
-def stat_creation(country, division, team):
+def store_team_data(country):
     """
 
+    :param country:
+    :return:
+    """
+
+    df = create_seasons_list(country)
+
+    return df
+
+def goal_stats(df, division, team):
+    """
+    This function looks at the % of goals scored home and away
+    relative to the shots taken in each game by season.
 
 
     :param country:
@@ -239,4 +251,60 @@ def stat_creation(country, division, team):
     :return:
     """
 
-    pass
+    df_fin = pd.DataFrame()
+
+    df['home_team'] = df['home_team'].str.lower()
+    df['away_team'] = df['away_team'].str.lower()
+
+    df = df[df['division'] == division]
+
+    df_home = df[df['home_team'] == team]
+    df_away = df[df['away_team'] == team]
+
+    home_goals = df_home.groupby(['home_team', 'dateYear'])['home_team_goals', 'home_team_shots'].sum().reset_index()
+    home_goals['pct_per_season'] = (home_goals['home_team_goals'] / home_goals['home_team_shots']) * 100
+    away_goals = df_away.groupby(['away_team', 'dateYear'])['away_team_goals', 'away_team_shots'].sum().reset_index()
+    away_goals['pct_per_season'] = (away_goals['away_team_goals'] / away_goals['away_team_shots']) * 100
+
+    df_fin['season'] = home_goals['dateYear']
+    df_fin['overall_pct'] = (home_goals['pct_per_season'] + away_goals['pct_per_season']).round(2)
+    df_fin['home_pct'] = home_goals['pct_per_season'].round(2)
+    df_fin['away_pct'] = away_goals['pct_per_season'].round(2)
+
+    return df_fin
+
+def shot_stats(df, division, team):
+    """
+
+    :param df:
+    :param division:
+    :param team:
+    :return:
+    """
+
+    df_fin = pd.DataFrame()
+
+    df['home_team'] = df['home_team'].str.lower()
+    df['away_team'] = df['away_team'].str.lower()
+
+    df = df[df['division'] == division]
+
+    df_home = df[df['home_team'] == team]
+    df_away = df[df['away_team'] == team]
+
+    home_shots = df_home.groupby(['home_team', 'dateYear'])['home_team_shot_tar', 'home_team_shots'].sum().reset_index()
+    home_shots['pct_per_season'] = (home_shots['home_team_shot_tar'] / home_shots['home_team_shots']) * 100
+    away_shots = df_away.groupby(['away_team', 'dateYear'])['away_team_shot_tar', 'away_team_shots'].sum().reset_index()
+    away_shots['pct_per_season'] = (away_shots['away_team_shot_tar'] / away_shots['away_team_shots']) * 100
+
+    df_fin['season'] = home_shots['dateYear']
+    df_fin['overall_pct'] = (home_shots['pct_per_season'] + away_shots['pct_per_season'])
+    df_fin['total_shots'] = (home_shots['home_team_shots'] + away_shots['away_team_shots'])
+    df_fin['home_pct'] = (home_shots['home_team_shot_tar'] / df_fin['total_shots'] * 100).round(2)
+    df_fin['away_pct'] =(away_shots['away_team_shot_tar'] / df_fin['total_shots'] * 100).round(2)
+
+    return df_fin
+
+
+
+

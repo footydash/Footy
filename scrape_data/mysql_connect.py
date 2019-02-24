@@ -17,7 +17,7 @@ def create_tables():
     cursor = conn.cursor()
 
     query = """
-        CREATE TABLE footy_matches  (
+        CREATE TABLE test  (
             id int AUTO_INCREMENT PRIMARY KEY,
             date VARCHAR(255) NOT NULL,
             home_team VARCHAR(255) NOT NULL,
@@ -40,7 +40,8 @@ def create_tables():
             away_yellow INT DEFAULT NULL,
             home_red INT DEFAULT NULL,
             away_red INT DEFAULT NULL,
-            country VARCHAR(255) NOT NULL
+            country VARCHAR(255) NOT NULL,
+            division VARCHAR(225) NOT NULL
         );
     """
     print(query)

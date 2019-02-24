@@ -88,7 +88,7 @@ app.layout = html.Div([
 
             *Under Construction* 
             '''),
-            html.Footer(children='Created by Salvatore Architetto: https://github.com/salarchitetto')],
+            html.Footer(children='Created by Salvatore Architetto: https://github.com/salarchitetto', id='home-footer')],
             id='home'),
 
         # HTML code for stats
@@ -171,9 +171,16 @@ app.layout = html.Div([
                     ]),
                     dcc.Tab(label='Stats Table', style=tab_style, selected_style=tab_selected_style, children=[
                         html.Div([
-                            html.H1(children='Coming Soon')
-                        ])
+                            html.H1(children='In Progress'),
+                            html.Div([
+                                dcc.Graph(id='goals-scored', config=plotConfig),
+                                dcc.Graph(id='shot-stats', config=plotConfig)
+                            ])
+                        ]),
                     ]),
+                    dcc.Tab(label='League Stats', style=tab_style, selected_style=tab_selected_style, children=[
+                        html.H1(children='Overall league statistics')
+                    ])
                 ], className="col-xs-9 right-panel", style=tabs_styles)
             ], className='row', id='test2'),
 
@@ -191,6 +198,7 @@ app.layout = html.Div([
     ], style={'display': 'block'}),
 
     dcc.Store(id='pct_store'),
+    dcc.Store('team_stats'),
     # Add bootstrap css
     app.css.append_css({"external_url": [
         "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"

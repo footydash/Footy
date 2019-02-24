@@ -4,9 +4,8 @@ from scrape_data.mysql_connect import *
 from scrape_data.clean_data import *
 import csv
 
-def add_data(directory, country):
+def add_data(directory, country, division):
     """
-
     :param database:
     :param file_path:
     :return:
@@ -15,7 +14,7 @@ def add_data(directory, country):
 
     file_path = read_dir(directory)
     print("cleaning csv...")
-    cleaner = remove_null_values(file_path, country)
+    cleaner = remove_null_values(file_path, country, division)
 
     for x in file_path:
         with open(x, 'r') as file, conn:
@@ -32,6 +31,7 @@ def add_data(directory, country):
                 away_team_goals = column['FTAG']
                 full_time_result = str(column['FTR'])
                 country = str(column['country'])
+                division = str(column['division'])
                 try:
                     ht_home_goals = column['HTHG']
                     ht_away_goals = column['HTAG']
@@ -51,14 +51,14 @@ def add_data(directory, country):
                 except Exception as e:
                     continue
 
-                sql_info = "INSERT INTO footy_matches (date, home_team, away_team, home_team_goals, away_team_goals," \
+                sql_info = "INSERT INTO test (date, home_team, away_team, home_team_goals, away_team_goals," \
                            "full_time_results, ht_home_goals, ht_away_goals, ht_result, home_team_shots, away_team_shots," \
                            "home_team_shot_tar, away_team_shot_tar, home_corner, away_corner, home_foul, away_foul," \
-                           "home_yellow, away_yellow, home_red, away_red, country) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
-                           "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                           "home_yellow, away_yellow, home_red, away_red, country, division) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                           "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                 values = (date, home_team, away_team, home_team_goals, away_team_goals, full_time_result, ht_home_goals,
                           ht_away_goals, ht_result, home_team_shots, away_team_shots,home_team_shot_tar, away_team_shot_tar,
-                          home_corner, away_corner, home_foul, away_foul, home_yellow, away_yellow, home_red, away_red, country)
+                          home_corner, away_corner, home_foul, away_foul, home_yellow, away_yellow, home_red, away_red, country, division)
 
                 cursor.execute(sql_info, values)
                 conn.commit()
@@ -67,3 +67,4 @@ def add_data(directory, country):
             print('***************************************')
 
 # add = add_data('path','spain')
+add_data('C:\\Users\\Sal Architetto\\Desktop\\New_footy_files\\footy_files\\England\\Championship',)
