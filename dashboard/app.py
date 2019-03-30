@@ -98,7 +98,7 @@ app.layout = html.Div([
             html.Div([
                 # html.Br(),
                 html.Div([
-                    html.P(children='Choose Criteria Here!', id='h4stats'),
+                    html.P(children='Choose Criteria Here', id='h4stats'),
                     html.Button(id='win_pct_button', n_clicks=0, children='Show win-tie-loss % for your team.',
                                 className='btn btn-primary'),
                     dcc.Dropdown(id='countries', options=countryDropdown, placeholder='Please select a country.'),
@@ -112,7 +112,7 @@ app.layout = html.Div([
                 # html.Div([html.Div(className='verticalLine')], className='col-xs-1 left-panel'),
                 html.Br(),
                 dcc.Tabs(id='tabs', children=[
-                    dcc.Tab(label='Live Scores', style=tab_style,selected_style=tab_selected_style, children=[
+                    dcc.Tab(label='Live Scores', id='live_score', style=tab_style,selected_style=tab_selected_style, children=[
                         html.H1(children='Coming Soon')
                     ]),
                     dcc.Tab(label='Win/Loss PCT', style=tab_style, selected_style=tab_selected_style, children=[
@@ -174,12 +174,15 @@ app.layout = html.Div([
                             html.H1(children='In Progress'),
                             html.Div([
                                 dcc.Graph(id='goals-scored', config=plotConfig),
-                                dcc.Graph(id='shot-stats', config=plotConfig)
+                                dcc.Graph(id='shot-stats', config=plotConfig),
+                                dcc.Graph(id='foul-stats', config=plotConfig)
                             ])
                         ]),
                     ]),
-                    dcc.Tab(label='League Stats', style=tab_style, selected_style=tab_selected_style, children=[
-                        html.H1(children='Overall league statistics')
+                    dcc.Tab(label='League Stats', id='league-tab',style=tab_style, selected_style=tab_selected_style, children=[
+                        # html.H1(children='Overall league statistics'),
+                        html.H2(id='tab-update', children=[],),
+                        dcc.Graph(id='per_league_wins')
                     ])
                 ], className="col-xs-9 right-panel", style=tabs_styles)
             ], className='row', id='test2'),
@@ -198,7 +201,8 @@ app.layout = html.Div([
     ], style={'display': 'block'}),
 
     dcc.Store(id='pct_store'),
-    dcc.Store('team_stats'),
+    dcc.Store(id='team_stats'),
+    dcc.Store(id='overall_download'),
     # Add bootstrap css
     app.css.append_css({"external_url": [
         "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"

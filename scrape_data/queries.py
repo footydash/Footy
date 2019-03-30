@@ -7,10 +7,10 @@ except:
     pymysql.install_as_MySQLdb()
     import MySQLdb
 
-def footy_connect(host=eval(os.environ['CONN_CRED'])['host'],
-                  user=eval(os.environ['CONN_CRED'])['user'],
-                  passwd=eval(os.environ['CONN_CRED'])['passwd'],
-                  dbName=eval(os.environ['CONN_CRED'])['db']):
+def footy_connect(host=eval(os.environ['FOOTY_CRED'])['host'],
+                  user=eval(os.environ['FOOTY_CRED'])['user'],
+                  passwd=eval(os.environ['FOOTY_CRED'])['passwd'],
+                  dbName=eval(os.environ['FOOTY_CRED'])['db']):
 
     footy_conn = MySQLdb.connect(
         host=host,

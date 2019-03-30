@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import datetime
 import numpy as np
 from collections import *
 from scrape_data.queries import *
@@ -48,7 +49,7 @@ def home_vs_away(df, team_name):
 
     return df
 
-def run_win_pct(team_name, country):
+def run_win_pct(team_name, df):
     """
     Function that calculates a teams winning percentage Year over Year (YoY)
     Calculation:
@@ -63,9 +64,8 @@ def run_win_pct(team_name, country):
     :param team_name: Takes in the state of the team_names dropdown
     :return:a dataframe That returns percentages for specific teams
     """
-    print('working')
 
-    df = create_seasons_list(country)
+    print('working')
 
     df['home_team'] = df['home_team'].str.lower()
     df['away_team'] = df['away_team'].str.lower()
@@ -138,42 +138,66 @@ def run_win_pct(team_name, country):
 
     return fin
 
-def create_seasons_list(country):
+def create_seasons_list(df=None, country = None):
     """
     This function pretty much breaks down the date of a given match
     then buckets that information to a particular season. I.E: a match played
     on 02/07/2018 would be bucketed in the 2017/2018 season.
 
-    :param country: a chosen country from the dropdown
+    :param df: takes in a dataframe
     :return: a dataframe
     """
-    conn = footy_connect()
-    df = grab_data(conn, country)
 
-    real_dates = []
-    import re
-    m = '\d+'
-    for index, row in df.iterrows():
-        x = re.findall(m, row['dates'])
-        x = int(x[1])
-        if x >= 8:
-            year1 = int(row['dates'][-2:]) + 2000
-            year2 = year1 + 1
-            real_dates.append(str(year1) + "/" + str(year2))
-        elif x <= 5:
-            year1 = int(row['dates'][-2:]) + 2000
-            year2 = year1 - 1
-            real_dates.append(str(year2) + "/" + str(year1))
-        else:
-            real_dates.append(0)
+    if country is not None:
 
-    df['dateYear'] = real_dates
-    df = df[df['dateYear'] != 0]
-    conn.close()
+        conn = footy_connect()
+        df = grab_data(conn, country)
+
+        real_dates = []
+        import re
+        m = '\d+'
+        for index, row in df.iterrows():
+            x = re.findall(m, row['dates'])
+            x = int(x[1])
+            if x >= 8:
+                year1 = int(row['dates'][-2:]) + 2000
+                year2 = year1 + 1
+                real_dates.append(str(year1) + "/" + str(year2))
+            elif x <= 5:
+                year1 = int(row['dates'][-2:]) + 2000
+                year2 = year1 - 1
+                real_dates.append(str(year2) + "/" + str(year1))
+            else:
+                real_dates.append(0)
+
+        df['dateYear'] = real_dates
+        df = df[df['dateYear'] != 0]
+        conn.close()
+
+    else:
+        real_dates = []
+        import re
+        m = '\d+'
+        for index, row in df.iterrows():
+            x = re.findall(m, row['dates'])
+            x = int(x[1])
+            if x >= 8:
+                year1 = int(row['dates'][-2:]) + 2000
+                year2 = year1 + 1
+                real_dates.append(str(year1) + "/" + str(year2))
+            elif x <= 5:
+                year1 = int(row['dates'][-2:]) + 2000
+                year2 = year1 - 1
+                real_dates.append(str(year2) + "/" + str(year1))
+            else:
+                real_dates.append(0)
+
+        df['dateYear'] = real_dates
+        df = df[df['dateYear'] != 0]
 
     return df
 
-def table_per_season(country, division, year):
+def table_per_season(df, division, year):
     """
     Function that returns a complete dataframe with what you would normally
     see as a soccer league table. It contains the matches played, wins, draws,
@@ -186,7 +210,6 @@ def table_per_season(country, division, year):
     :return: a dataframe with the information for a specific season
     """
 
-    df = create_seasons_list(country)
     df = df[df['dateYear'] == year]
     df = df[df['division'] == division]
 
@@ -227,17 +250,17 @@ def table_per_season(country, division, year):
     final = final.sort_values(by='PTS', ascending=False)
 
     return final
-
-def store_team_data(country):
-    """
-
-    :param country:
-    :return:
-    """
-
-    df = create_seasons_list(country)
-
-    return df
+#
+# def store_team_data(country):
+#     """
+#
+#     :param country:
+#     :return:
+#     """
+#
+#     df = create_seasons_list(country)
+#
+#     return df
 
 def goal_stats(df, division, team):
     """
@@ -305,6 +328,73 @@ def shot_stats(df, division, team):
 
     return df_fin
 
+def foul_stats(df, division, team):
+    """
 
+    :param df:
+    :param division:
+    :param team:
+    :return:
+    """
+
+    df_fin = pd.DataFrame()
+
+    df['home_team'] = df['home_team'].str.lower()
+    df['away_team'] = df['away_team'].str.lower()
+
+    df = df[df['division'] == division]
+
+    df_home = df[df['home_team'] == team]
+    df_away = df[df['away_team'] == team]
+
+    home_foul = df_home.groupby(['home_team', 'dateYear'])['home_foul','home_yellow','home_red'].sum().reset_index()
+    home_foul['yellow_pct'] = (home_foul['home_yellow'] / home_foul['home_foul'] * 100).round(2)
+    home_foul['red_pct'] = (home_foul['home_red'] / home_foul['home_foul'] * 100).round(2)
+    away_foul = df_away.groupby(['away_team', 'dateYear'])['away_foul', 'away_yellow', 'away_red'].sum().reset_index()
+    away_foul['yellow_pct'] = (away_foul['away_yellow'] / away_foul['away_foul'] * 100).round(2)
+    away_foul['red_pct'] = (away_foul['away_red'] / away_foul['away_foul'] * 100).round(2)
+
+    df_fin['season'] = home_foul['dateYear']
+    df_fin['home_yellow_pct'] = home_foul['yellow_pct']
+    df_fin['home_red_pct'] = home_foul['red_pct']
+    df_fin['away_yellow_pct'] = away_foul['yellow_pct']
+    df_fin['away_red_pct'] = away_foul['red_pct']
+
+    return df_fin
+
+#start of league stats
+
+def past_five_years():
+    """
+
+    :param df:
+    :return:
+    """
+
+    year = datetime.datetime.today().year
+    ranges = list(range(year, year - 6, -1))
+    ranges = ' '.join(str(x) for x in ranges).split()
+
+    return ranges
+
+def top_leagues():
+    return ['Bundesliga', 'La Liga', 'Ligue 1', 'Premier League', 'Serie A']
+
+def home_win_per_league(df):
+    """
+
+    :param df:
+    :return:
+    """
+
+    #home and away wins per league
+
+    h_win = df.groupby(['division', 'dateYear',])['full_time_results'].apply(
+        lambda x: x[x.str.contains('H')].count()).reset_index()
+
+    h_win = h_win[h_win['division'].str.contains('|'.join(top_leagues()))]
+    h_win = h_win[h_win['division'] != 'Bundesliga Two']
+
+    return h_win
 
 
