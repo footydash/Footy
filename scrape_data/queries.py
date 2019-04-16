@@ -62,18 +62,20 @@ def grab_team_names(conn, division=None, country=None):
     :param country:
     :return:
     """
+
     names = """
-        SELECT DISTINCT home_team
+        SELECT DISTINCT home_team,
+        dates
         FROM footy_data
      """
 
     if country is not None:
-        names = names + "WHERE division IN ('" + str(division) + "')"
+        names = names + "WHERE division IN ('" + str(country) + "')"
 
     if division is not None:
-        names = names + " AND country IN ('" + str(country) + "')"
+        names = names + " AND country IN ('" + str(division) + "')"
 
-    names = names + " ORDER BY home_team ASC"
+    names = names + " AND home_team != '0' ORDER BY home_team ASC"
 
     df = pd.read_sql(names, conn)
 

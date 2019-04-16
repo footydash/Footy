@@ -41,12 +41,11 @@ def populate_teams(country, division):
     if country is None: return []
 
     team_names = choose_team(country, division)
-
     teams = []
 
-    print(teams)
-    for x in range(0, len(team_names)): teams.append(
-        dict(label=team_names['home_team'][x], value=team_names['home_team'][x].lower()
+    for index, row in team_names.iterrows():
+        teams.append(
+        dict(label=row['home_team'], value=row['home_team'].lower()
     ))
 
     return teams
@@ -267,31 +266,10 @@ def show_league_tables(n_clicks, data, division, season):
         return [{}]
 
     df = pd.read_json(data)
-    print(division)
+
     table = table_per_season(df, division, season)
 
     return table.to_dict(orient='records')
-
-# @app.callback(
-#     Output('team_stats', 'data'),
-#     [Input('win_pct_button', 'n_clicks')],
-#     [State('countries', 'value')]
-# )
-# def store_team_pct(n_clicks, country):
-#     """
-#
-#     :param n_clicks:
-#     :param country:
-#     :return:
-#     """
-#
-#     if n_clicks == 0:
-#         return []
-#
-#     df = store_team_data(country)
-#
-#     return df.to_json()
-
 
 @app.callback(
     Output('goals-scored', 'figure'),

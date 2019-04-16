@@ -13,11 +13,21 @@ def choose_team(country_name, division):
     :param country_name:
     :return: list of team names per country
     """
+
+    from datetime import datetime
     #connecting to DB
     conn = footy_connect()
 
     #grabbing dataframe
-    df = grab_team_names(conn, country_name, division)
+    df = grab_team_names(conn, division, country_name)
+
+    df = create_seasons_list(df)
+
+    today_year = datetime.now().year
+    full = str(today_year-1) + '/' + str(today_year)
+
+    df = df.loc[df['dateYear'] == full]
+    df = df.drop_duplicates(subset='home_team')
 
     conn.close()
 
