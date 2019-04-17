@@ -275,10 +275,9 @@ def show_league_tables(n_clicks, data, division, season):
     Output('goals-scored', 'figure'),
     [Input('win_pct_button', 'n_clicks')],
     [State('overall_download', 'data'),
-     State('divisions', 'value'),
      State('indi-teams', 'value')]
 )
-def goal_pct(n_clicks, data, division, team):
+def goal_pct(n_clicks, data, team):
     """
 
     :param n_clicks:
@@ -291,7 +290,7 @@ def goal_pct(n_clicks, data, division, team):
         return []
 
     df = pd.read_json(data)
-    df = goal_stats(df, division, team)
+    df = goal_stats(df, team)
 
     overall_pct = go.Bar(
         x=df['season'],
@@ -327,10 +326,9 @@ def goal_pct(n_clicks, data, division, team):
     Output('shot-stats', 'figure'),
     [Input('win_pct_button', 'n_clicks')],
     [State('overall_download', 'data'),
-     State('divisions', 'value'),
      State('indi-teams', 'value')]
 )
-def shot_data(n_clicks, data, division, team):
+def shot_data(n_clicks, data, team):
     """
 
     :param data:
@@ -343,7 +341,7 @@ def shot_data(n_clicks, data, division, team):
         return []
 
     df = pd.read_json(data)
-    df = shot_stats(df, division, team)
+    df = shot_stats(df, team)
 
     home_pct = go.Bar(
         x=df['season'],
@@ -372,10 +370,9 @@ def shot_data(n_clicks, data, division, team):
     Output('foul-stats', 'figure'),
     [Input('win_pct_button', 'n_clicks')],
     [State('overall_download', 'data'),
-     State('divisions', 'value'),
      State('indi-teams', 'value')]
 )
-def show_foul_stats(n_clicks, data, division, team):
+def show_foul_stats(n_clicks, data, team):
     """
 
     :param data:
@@ -389,7 +386,7 @@ def show_foul_stats(n_clicks, data, division, team):
         return []
 
     df = pd.read_json(data)
-    df = foul_stats(df, division, team)
+    df = foul_stats(df, team)
 
     home_yellow = go.Bar(
         x=df['season'],

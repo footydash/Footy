@@ -24,7 +24,7 @@ $.fn.followTo = function (pos) {
 
 $('#test').followTo(250);
 
-document.getElementById('live_score').onclick = function() {
+document.getElementById('stats').onclick = function() {
   var newDiv = document.createElement('div');
   newDiv.className = '_dash-loading-callback';
   newDiv.id = 'loading';

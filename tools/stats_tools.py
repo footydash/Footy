@@ -272,7 +272,7 @@ def table_per_season(df, division, year):
 #
 #     return df
 
-def goal_stats(df, division, team):
+def goal_stats(df, team):
     """
     This function looks at the % of goals scored home and away
     relative to the shots taken in each game by season.
@@ -289,7 +289,7 @@ def goal_stats(df, division, team):
     df['home_team'] = df['home_team'].str.lower()
     df['away_team'] = df['away_team'].str.lower()
 
-    df = df[df['division'] == division]
+    # df = df[df['division'] == division]
 
     df_home = df[df['home_team'] == team]
     df_away = df[df['away_team'] == team]
@@ -306,7 +306,7 @@ def goal_stats(df, division, team):
 
     return df_fin
 
-def shot_stats(df, division, team):
+def shot_stats(df, team):
     """
 
     :param df:
@@ -319,8 +319,6 @@ def shot_stats(df, division, team):
 
     df['home_team'] = df['home_team'].str.lower()
     df['away_team'] = df['away_team'].str.lower()
-
-    df = df[df['division'] == division]
 
     df_home = df[df['home_team'] == team]
     df_away = df[df['away_team'] == team]
@@ -338,7 +336,7 @@ def shot_stats(df, division, team):
 
     return df_fin
 
-def foul_stats(df, division, team):
+def foul_stats(df, team):
     """
 
     :param df:
@@ -351,8 +349,6 @@ def foul_stats(df, division, team):
 
     df['home_team'] = df['home_team'].str.lower()
     df['away_team'] = df['away_team'].str.lower()
-
-    df = df[df['division'] == division]
 
     df_home = df[df['home_team'] == team]
     df_away = df[df['away_team'] == team]
