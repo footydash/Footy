@@ -482,15 +482,7 @@ def show_overall_wins(data, n_clicks):
     wins = home_win_per_league(df)
     wins = wins.sort_values(by = 'dateYear', ascending=True)
 
-    bundes = wins[wins['division'] == 'Bundesliga']
-    bundes = bundes[2:]
-    liga = wins[wins['division'] == 'La Liga']
-    liga = liga[1:]
-    ligue = wins[wins['division'] == 'Ligue 1']
-    prem = wins[wins['division'] == 'Premier League']
-    prem = prem[6:]
-    serie = wins[wins['division'] == 'Serie A']
-    serie = serie[1:]
+    bundes, liga, ligue, prem, serie = full_league_conversion(wins)
 
     traces = [go.Scatter(x=bundes['dateYear'], y=bundes['full_time_results'], name='Bundesliga',
                          line=(dict(color=footy_colors('MAASTRICHT BLUE')))),
@@ -504,7 +496,7 @@ def show_overall_wins(data, n_clicks):
                          line=(dict(color=footy_colors('ILLUMINATING EMERALD'))))
               ]
 
-    layout = dict(title='Wins by Each Division per Year',
+    layout = dict(title='Total Wins by Each Division per Year',
                   showlegend=True,
                   paper_bgcolor='#EEEEEE',
                   plot_bgcolor='#EEEEEE',
@@ -513,5 +505,87 @@ def show_overall_wins(data, n_clicks):
 
     return (dict(data=traces, layout=layout))
 
+@app.callback(
+    Output('per_league_goals','figure'),
+    [Input('overall_download','data'),
+     Input('league-tab', 'n_clicks')]
+)
+def show_all_goals(data, n_clicks):
+    """
 
+    :param data:
+    :param n_clicks:
+    :return:
+    """
+    if n_clicks == 0:
+        return []
 
+    df = pd.read_json(data)
+    goals = total_goals_per_season(df)
+    goals = goals.sort_values(by = 'dateYear', ascending=True)
+
+    bundes, liga, ligue, prem, serie = full_league_conversion(goals)
+
+    traces = [go.Scatter(x=bundes['dateYear'], y=bundes['all_goals'], name='Bundesliga',
+                         line=(dict(color=footy_colors('MAASTRICHT BLUE')))),
+              go.Scatter(x=liga['dateYear'], y=liga['all_goals'], name='La Liga',
+                         line=(dict(color=footy_colors('YANKEES BLUE')))),
+              go.Scatter(x=ligue['dateYear'], y=ligue['all_goals'], name='Ligue 1',
+                         line=(dict(color=footy_colors('INDEPENDENCE')))),
+              go.Scatter(x=prem['dateYear'], y=prem['all_goals'], name='Premier League',
+                         line=(dict(color=footy_colors('MIDNIGHT GREEN')))),
+              go.Scatter(x=serie['dateYear'], y=serie['all_goals'], name='Serie A',
+                         line=(dict(color=footy_colors('ILLUMINATING EMERALD'))))
+              ]
+
+    layout = dict(title='Total Goals by Each Division per Year',
+                  showlegend=True,
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE',
+                  xaxis=dict(tickvals=prem.dateYear, ticktext=prem.dateYear)
+                  )
+
+    return (dict(data=traces, layout=layout))
+
+@app.callback(
+    Output('avgGoals_perSeason', 'figure'),
+    [Input('overall_download','data'),
+     Input('league-tab', 'n_clicks')]
+)
+def show_avg_goals(data, n_clicks):
+    """
+
+    :param data:
+    :param n_clicks:
+    :return:
+    """
+
+    if n_clicks == 0:
+        return []
+
+    df = pd.read_json(data)
+    goals = average_goals_per_season(df)
+    goals = goals.sort_values(by = 'dateYear', ascending=True)
+
+    bundes, liga, ligue, prem, serie = full_league_conversion(goals)
+
+    traces = [go.Scatter(x=bundes['dateYear'], y=bundes['all_goals'], name='Bundesliga',
+                         line=(dict(color=footy_colors('MAASTRICHT BLUE')))),
+              go.Scatter(x=liga['dateYear'], y=liga['all_goals'], name='La Liga',
+                         line=(dict(color=footy_colors('YANKEES BLUE')))),
+              go.Scatter(x=ligue['dateYear'], y=ligue['all_goals'], name='Ligue 1',
+                         line=(dict(color=footy_colors('INDEPENDENCE')))),
+              go.Scatter(x=prem['dateYear'], y=prem['all_goals'], name='Premier League',
+                         line=(dict(color=footy_colors('MIDNIGHT GREEN')))),
+              go.Scatter(x=serie['dateYear'], y=serie['all_goals'], name='Serie A',
+                         line=(dict(color=footy_colors('ILLUMINATING EMERALD'))))
+              ]
+
+    layout = dict(title='Average Goals by Each Division per Year',
+                  showlegend=True,
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE',
+                  xaxis=dict(tickvals=prem.dateYear, ticktext=prem.dateYear)
+                  )
+
+    return (dict(data=traces, layout=layout))

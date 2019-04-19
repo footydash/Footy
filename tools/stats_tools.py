@@ -260,17 +260,6 @@ def table_per_season(df, division, year):
     final = final.sort_values(by='PTS', ascending=False)
 
     return final
-#
-# def store_team_data(country):
-#     """
-#
-#     :param country:
-#     :return:
-#     """
-#
-#     df = create_seasons_list(country)
-#
-#     return df
 
 def goal_stats(df, team):
     """
@@ -403,4 +392,52 @@ def home_win_per_league(df):
 
     return h_win
 
+def total_goals_per_season(df):
+    """
+
+    :param df:
+    :return:
+    """
+
+    goals = df.groupby(['division', 'dateYear'])['home_team_goals', 'away_team_goals'].sum().reset_index()
+    goals = goals[goals['division'].str.contains('|'.join(top_leagues()))]
+    goals = goals[goals['division'] != 'Bundesliga Two']
+
+    goals['all_goals'] = goals['home_team_goals'] + goals['away_team_goals']
+
+    return goals
+
+def full_league_conversion(df):
+    """
+
+    :param df:
+    :return:
+    """
+
+    bundes = df[df['division'] == 'Bundesliga']
+    bundes = bundes[2:]
+    liga = df[df['division'] == 'La Liga']
+    liga = liga[1:]
+    ligue = df[df['division'] == 'Ligue 1']
+    prem = df[df['division'] == 'Premier League']
+    prem = prem[6:]
+    serie = df[df['division'] == 'Serie A']
+    serie = serie[1:]
+
+    return bundes, liga, ligue, prem, serie
+
+def average_goals_per_season(df):
+    """
+
+    :param df:
+    :return:
+    """
+
+    avg_goals = df.groupby(['division', 'dateYear'])['home_team_goals', 'away_team_goals'].mean().reset_index()
+    avg_goals = avg_goals[avg_goals['division'].str.contains('|'.join(top_leagues()))]
+    avg_goals = avg_goals[avg_goals['division'] != 'Bundesliga Two']
+
+    avg_goals['all_goals'] = avg_goals['home_team_goals'] + avg_goals['away_team_goals']
+
+    return avg_goals
 

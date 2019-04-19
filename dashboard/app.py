@@ -182,7 +182,9 @@ app.layout = html.Div([
                     dcc.Tab(label='League Stats', id='league-tab',style=tab_style, selected_style=tab_selected_style, children=[
                         # html.H1(children='Overall league statistics'),
                         html.H2(id='tab-update', children=[],),
-                        dcc.Graph(id='per_league_wins')
+                        dcc.Graph(id='per_league_wins'),
+                        dcc.Graph(id='per_league_goals'),
+                        dcc.Graph(id='avgGoals_perSeason')
                     ])
                 ], className="col-xs-9 right-panel", style=tabs_styles)
             ], className='row', id='test2'),
