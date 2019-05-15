@@ -9,6 +9,7 @@ from tools.stats_tools import *
 import plotly.graph_objs as go
 from tools.footy_tools import *
 from scrape_data.queries import *
+from tools.scraper import *
 import dash_html_components as html
 import dash_table
 
@@ -111,7 +112,7 @@ def win_pct_graph(data, team_name, n_clicks):
                   plot_bgcolor='#EEEEEE'
                   )
 
-    return (dict(data=traces, layout = layout))
+    return dict(data=traces, layout = layout)
 
 @app.callback(
     Output('home_win_pct_graph', 'figure'),
@@ -142,7 +143,7 @@ def win_home_loss_pct(data, team_name, n_clicks):
                     plot_bgcolor = '#EEEEEE'
     )
 
-    return (dict(data=traces, layout=layout))
+    return dict(data=traces, layout=layout)
 
 
 @app.callback(
@@ -174,7 +175,7 @@ def loss_home_pct(data, team_name, n_clicks):
                   plot_bgcolor='#EEEEEE'
                   )
 
-    return (dict(data=traces, layout=layout))
+    return dict(data=traces, layout=layout)
 
 @app.callback(
     Output('seasonlist','options'),
@@ -200,6 +201,8 @@ def season_list(country):
     for x in range(0, len(season)): seasons.append(
         dict(label=season[x], value=season[x]
     ))
+
+    seasons.reverse()
 
     return seasons
 
@@ -503,7 +506,7 @@ def show_overall_wins(data, n_clicks):
                   xaxis=dict(tickvals=prem.dateYear, ticktext=prem.dateYear)
                   )
 
-    return (dict(data=traces, layout=layout))
+    return dict(data=traces, layout=layout)
 
 @app.callback(
     Output('per_league_goals','figure'),
@@ -545,7 +548,7 @@ def show_all_goals(data, n_clicks):
                   xaxis=dict(tickvals=prem.dateYear, ticktext=prem.dateYear)
                   )
 
-    return (dict(data=traces, layout=layout))
+    return dict(data=traces, layout=layout)
 
 @app.callback(
     Output('avgGoals_perSeason', 'figure'),
@@ -588,4 +591,107 @@ def show_avg_goals(data, n_clicks):
                   xaxis=dict(tickvals=prem.dateYear, ticktext=prem.dateYear)
                   )
 
-    return (dict(data=traces, layout=layout))
+    return dict(data=traces, layout=layout)
+
+@app.callback(
+    Output('top_team_goals', 'figure'),
+    [Input('overall_download','data'),
+     Input('league-tab', 'n_clicks')]
+)
+def show_top_team(data, n_clicks):
+    """
+
+    :param data:
+    :param n_clicks:
+    :return:
+    """
+
+    if n_clicks == 0:
+        return []
+
+    df = pd.read_json(data)
+    topTeams = top_team_goals(df)
+
+    data = go.Bar(
+        x=topTeams['home_team'],
+        y=topTeams['overall'],
+        marker=dict(color=footy_colors('MAASTRICHT BLUE')),
+        name='Highest goal scorers')
+    data = [data]
+
+    layout = dict(title= 'Most goals per team (2006-2019)',
+                  showlegend=True,
+                  paper_bgcolor='#EEEEEE',
+                  plot_bgcolor='#EEEEEE',
+                  xaxis=dict(tickangle=45))
+
+    return dict(data=data, layout=layout)
+
+@app.callback(
+    Output('today', 'data'),
+    [Input('league-tab', 'n_clicks')]
+)
+def update_today(n_clicks):
+    """
+
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = Scraper.live_scores(Scraper.paths['today'])
+    df = change_data(df)
+
+    return df.to_dict(orient='records')
+
+@app.callback(
+    Output('live', 'data'),
+    [Input('league-tab', 'n_clicks')]
+)
+def update_live(n_clicks):
+    """
+
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = Scraper.live_scores(Scraper.paths['live'])
+    df = change_data(df, live=True)
+
+    return df.to_dict(orient='records')
+
+@app.callback(
+    Output('yesterday', 'data'),
+    [Input('league-tab', 'n_clicks')]
+)
+def update_yesterday(n_clicks):
+    """
+
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = Scraper.live_scores(Scraper.paths['yesterday'])
+    df = change_data(df)
+
+    return df.to_dict(orient='records')
+
+@app.callback(
+    Output('tomorrow', 'data'),
+    [Input('league-tab', 'n_clicks')]
+)
+def update_tomorrow(n_clicks):
+    """
+
+    :return:
+    """
+    if n_clicks == 0:
+        return []
+
+    df = Scraper.live_scores(Scraper.paths['tomorrow'])
+    df = change_data(df)
+
+    return df.to_dict(orient='records')
+

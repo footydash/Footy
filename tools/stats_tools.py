@@ -407,7 +407,7 @@ def total_goals_per_season(df):
 
     return goals
 
-def full_league_conversion(df):
+def  full_league_conversion(df):
     """
 
     :param df:
@@ -441,3 +441,39 @@ def average_goals_per_season(df):
 
     return avg_goals
 
+def top_team_goals(df):
+    """
+
+    :param df:
+    :return:
+    """
+
+    topTeamsHome = df.groupby(['home_team', 'dateYear'])['home_team_goals'].sum().reset_index()
+    topTeamsAway = df.groupby(['away_team', 'dateYear'])['away_team_goals'].sum().reset_index()
+
+    topTeam = topTeamsHome.merge(topTeamsAway, how='left', left_on= ['home_team', 'dateYear'], right_on= ['away_team', 'dateYear'])
+    topTeam = topTeam.groupby(['home_team', 'dateYear'])['home_team_goals', 'away_team_goals'].sum().reset_index()
+
+    home_team = []
+    overall = []
+    dateYear = []
+
+    dates = ['2000/2001', '2001/2002', '2002/2003', '2003/2004', '2004/2005', '2005/2006']
+    for index, row in topTeam.iterrows():
+        if row['dateYear'] in dates:
+            pass
+        else:
+            home_team.append(row['home_team'])
+            overall.append(row['home_team_goals'] + row['away_team_goals'])
+            dateYear.append(row['dateYear'])
+
+    tt = pd.DataFrame()
+    tt['home_team'] = home_team
+    tt['overall'] = overall
+    tt['dateYear'] = dateYear
+
+    ntt = tt.groupby(['home_team'])['overall'].sum().reset_index()
+    print(ntt.sort_values(by='overall', ascending=False).head(20))
+    ntt = ntt.sort_values(by='overall', ascending=False).head(10)
+
+    return ntt
