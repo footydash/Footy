@@ -1,77 +1,68 @@
 import pandas as pd
-import datetime
-import time
+from datetime import datetime, timedelta
 import requests
-import numpy as np
-from bs4 import BeautifulSoup
-import lxml
-import html5lib
 
-class Scraper:
+page_url = 'https://www.soccervista.com/soccer_games.php?date='
+page_live = 'https://www.livescore.cz/live-soccer.php'
+today = datetime.now().strftime('%Y-%m-%d')
+yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
 
-    paths = {'live': 'https://www.livescore.cz/live-soccer.php',
-             'today': 'https://www.livescore.cz/index.php',
-             'yesterday': 'https://www.livescore.cz/yesterday.php',
-             'tomorrow': 'https://www.livescore.cz/tomorrow.php'}
+class Scrape:
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, page, t, y, tom, live):
+        self.page = page
+        self.t = t
+        self.y = y
+        self.tom = tom
+        self.live = live
 
+    def yesterday(self):
+        return self.page + self.y
 
-    def live_scores(path):
-        """
+    def today(self):
+        return self.page + self.t
 
-        :return:
-        """
-        try:
+    def tomorrow(self):
+        return self.page + self.tom
+
+    def live_score(self):
+        return self.live
+
+    @staticmethod
+    def soup(date, path):
+        if date == 'today':
             r = requests.get(path)
-            soup = BeautifulSoup(r.content, "html.parser")
-            df = pd.read_html(r.content, attrs={'class': 'tab main-live'})[0]
-            return df
-        except ValueError as e:
-            return "No live games on right now"
+            df = pd.read_html(r.content, attrs={'class':'main'})[0]
+            df = df[2:]
+        elif date == 'yesterday':
+            r = requests.get(path)
+            df = pd.read_html(r.content, attrs={'class':'main'})[0]
+            df = df[2:]
+        elif date == 'live':
+            try:
+                r = requests.get(path)
+                df = pd.read_html(r.content, attrs={'class': 'tab main-live'})[0]
+            except ValueError as e:
+                print(e)
+                return "No live games on right now!"
+        else:
+            r = requests.get(path)
+            df = pd.read_html(r.content, attrs={'class': 'main'})[0]
+            df = df[2:]
+        return df
 
+    @staticmethod
+    def col_drop(df):
+        cols = df.columns
+        return [x for x in cols if type(x) == str]
 
-def change_data(df, live=False):
-        if live is not False:
-            return df.rename(columns={0: 'Game Start', 1: 'Current Time', 2: 'Home Team',
+    @staticmethod
+    def change_data(df, date):
+        if date == 'live':
+            return df.rename(columns={0: 'Game Start', 1: 'Country / Live Time', 2: 'Home Team',
                                       3: 'Score', 4: 'Away Team'})
         else:
-            return df.rename(columns={0: 'Game Start', 1: 'Division', 2: 'Home Team' ,3: 'Score',
-                                      4: 'Away Team'})
 
-# class ScraperTest:
-#
-#     live = 'https://www.livescore.cz/live-soccer.php',
-#     today = 'https://www.livescore.cz/index.php',
-#     yesterday = 'https://www.livescore.cz/yesterday.php',
-#     tomorrow = 'https://www.livescore.cz/tomorrow.php'
-#
-#     def __init__(self, live, today, yesterday, tomorrow):
-#         self.live = live.live
-#         self.today = today.today
-#         self.yesterday = yesterday.yesterday
-#         self.tomorrow = tomorrow.tomorrow
-#
-#     def live_scores(self, path):
-#         """
-#
-#         :return:
-#         """
-#         try:
-#             if
-#             r = requests.get(path)
-#             soup = BeautifulSoup(r.content, "html.parser")
-#             df = pd.read_html(r.content, attrs={'class': 'tab main-live'})[0]
-#             return df
-#         except ValueError as e:
-#             return "No live games on right now"
-
-    # def change_data(df):
-    #     if Scraper.paths == Scraper.paths['live']:
-    #         return df.rename(columns={0: 'Game Start', 1: 'Current Time', 2: 'Home Team',
-    #                                   3: 'Score', 4: 'Away Team'})
-    #     else:
-    #         return df.rename(columns={0: 'Game Start', 1: 'Home Team', 3: 'Score',
-    #                                   4: 'Away Team'})
-
+            return df.rename(columns={0: 'Game Start', 1: 'Country', 2: 'Home Team',
+                                      3: 'Score', 4: 'Away Team'})

@@ -1,8 +1,6 @@
 import os
 import pandas as pd
 import datetime
-import numpy as np
-from collections import *
 from scrape_data.queries import *
 from scrape_data.mysql_connect import *
 
@@ -75,8 +73,6 @@ def run_win_pct(team_name, df):
     :return:a dataframe That returns percentages for specific teams
     """
 
-    print('working')
-
     df['home_team'] = df['home_team'].str.lower()
     df['away_team'] = df['away_team'].str.lower()
 
@@ -95,8 +91,6 @@ def run_win_pct(team_name, df):
 
     home_matches = home_matches.drop(columns = ['away_team'])
     away_matches = away_matches.drop(columns = ['home_team'])
-
-    print('calculating pcts')
 
     #wins per season
     home_team_win = home_matches.groupby(["home_team","dateYear"])["outcome"].apply(
@@ -125,7 +119,7 @@ def run_win_pct(team_name, df):
 
     match_numbers = matches_home.merge(matches_away, how='left', left_on='dateYear', right_on='dateYear')
 
-    print('finalizing')
+
     loss_merge = home_team_loss.merge(away_team_loss, how='left', left_on='dateYear', right_on='dateYear')
     tie_merge = home_team_tie.merge(away_team_tie, how='left', left_on='dateYear', right_on='dateYear')
     fin = home_team_win.merge(away_team_win, how = 'left', left_on='dateYear', right_on='dateYear')
@@ -265,12 +259,6 @@ def goal_stats(df, team):
     """
     This function looks at the % of goals scored home and away
     relative to the shots taken in each game by season.
-
-
-    :param country:
-    :param division:
-    :param team:
-    :return:
     """
 
     df_fin = pd.DataFrame()
@@ -296,13 +284,6 @@ def goal_stats(df, team):
     return df_fin
 
 def shot_stats(df, team):
-    """
-
-    :param df:
-    :param division:
-    :param team:
-    :return:
-    """
 
     df_fin = pd.DataFrame()
 
@@ -326,13 +307,6 @@ def shot_stats(df, team):
     return df_fin
 
 def foul_stats(df, team):
-    """
-
-    :param df:
-    :param division:
-    :param team:
-    :return:
-    """
 
     df_fin = pd.DataFrame()
 
@@ -360,11 +334,6 @@ def foul_stats(df, team):
 #start of league stats
 
 def past_five_years():
-    """
-
-    :param df:
-    :return:
-    """
 
     year = datetime.datetime.today().year
     ranges = list(range(year, year - 6, -1))
@@ -376,13 +345,6 @@ def top_leagues():
     return ['Bundesliga', 'La Liga', 'Ligue 1', 'Premier League', 'Serie A']
 
 def home_win_per_league(df):
-    """
-
-    :param df:
-    :return:
-    """
-
-    #home and away wins per league
 
     h_win = df.groupby(['division', 'dateYear',])['full_time_results'].apply(
         lambda x: x[x.str.contains('H')].count()).reset_index()
@@ -393,11 +355,6 @@ def home_win_per_league(df):
     return h_win
 
 def total_goals_per_season(df):
-    """
-
-    :param df:
-    :return:
-    """
 
     goals = df.groupby(['division', 'dateYear'])['home_team_goals', 'away_team_goals'].sum().reset_index()
     goals = goals[goals['division'].str.contains('|'.join(top_leagues()))]
@@ -408,11 +365,6 @@ def total_goals_per_season(df):
     return goals
 
 def  full_league_conversion(df):
-    """
-
-    :param df:
-    :return:
-    """
 
     bundes = df[df['division'] == 'Bundesliga']
     bundes = bundes[2:]
@@ -427,11 +379,6 @@ def  full_league_conversion(df):
     return bundes, liga, ligue, prem, serie
 
 def average_goals_per_season(df):
-    """
-
-    :param df:
-    :return:
-    """
 
     avg_goals = df.groupby(['division', 'dateYear'])['home_team_goals', 'away_team_goals'].mean().reset_index()
     avg_goals = avg_goals[avg_goals['division'].str.contains('|'.join(top_leagues()))]
@@ -442,11 +389,6 @@ def average_goals_per_season(df):
     return avg_goals
 
 def top_team_goals(df):
-    """
-
-    :param df:
-    :return:
-    """
 
     topTeamsHome = df.groupby(['home_team', 'dateYear'])['home_team_goals'].sum().reset_index()
     topTeamsAway = df.groupby(['away_team', 'dateYear'])['away_team_goals'].sum().reset_index()
@@ -473,7 +415,6 @@ def top_team_goals(df):
     tt['dateYear'] = dateYear
 
     ntt = tt.groupby(['home_team'])['overall'].sum().reset_index()
-    print(ntt.sort_values(by='overall', ascending=False).head(20))
     ntt = ntt.sort_values(by='overall', ascending=False).head(10)
 
     return ntt

@@ -1,18 +1,10 @@
 from .server import app
-import os
-import pandas as pd
-import numpy as np
-import json
 from dash.dependencies import Input, Output, State
-from scrape_data.queries import *
 from tools.stats_tools import *
 import plotly.graph_objs as go
 from tools.footy_tools import *
 from scrape_data.queries import *
 from tools.scraper import *
-import dash_html_components as html
-import dash_table
-
 
 try:
     import MySQLdb
@@ -33,12 +25,7 @@ legendConfig = dict(orientation='h', x=0, y=1.1)
     [State('countries', 'value')]
 )
 def populate_teams(country, division):
-    """
 
-    :param country:
-    :param division:
-    :return:
-    """
     if country is None: return []
 
     team_names = choose_team(country, division)
@@ -55,18 +42,10 @@ def populate_teams(country, division):
     Output('pct_store','data'),
     [Input('win_pct_button', 'n_clicks')],
     [State('indi-teams','value'),
-     State('countries','value'),
      State('overall_download', 'data')]
 )
-def store_pct_data(n_clicks, team_name, country, data):
-    """
+def store_pct_data(n_clicks, team_name, data):
 
-    :param n_clicks:
-    :param team_name:
-    :param country:
-    :param data:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -85,13 +64,7 @@ def store_pct_data(n_clicks, team_name, country, data):
      State('win_pct_button','n_clicks')]
 )
 def win_pct_graph(data, team_name, n_clicks):
-    """
 
-    :param df:
-    :param n_clicks:
-    :param team_name:
-    :return:
-    """
     if n_clicks == 0:
         return {'display':'none'}
 
@@ -121,12 +94,7 @@ def win_pct_graph(data, team_name, n_clicks):
      State('win_pct_button','n_clicks')]
 )
 def win_home_loss_pct(data, team_name, n_clicks):
-    """
 
-    :param n_clicks:
-    :param team_name:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -153,12 +121,7 @@ def win_home_loss_pct(data, team_name, n_clicks):
      State('win_pct_button','n_clicks')]
 )
 def loss_home_pct(data, team_name, n_clicks):
-    """
 
-    :param n_clicks:
-    :param team_name:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -182,12 +145,6 @@ def loss_home_pct(data, team_name, n_clicks):
     [Input('countries','value')]
 )
 def season_list(country):
-    """
-
-    :param data:
-    :param country:
-    :return:
-    """
 
     if country is None:
         return []
@@ -212,11 +169,7 @@ def season_list(country):
 )
 
 def division_list(country):
-    """
 
-    :param country:
-    :return:
-    """
     if country is None: return []
 
     conn = footy_connect()
@@ -236,13 +189,6 @@ def division_list(country):
     [State('divisions', 'value')]
 )
 def table_name(season, division):
-    """
-
-    :param n_clicks:
-    :param division:
-    :param season:
-    :return:
-    """
 
     if season is None:
         return str('Please enter a League and Table Year!')
@@ -257,14 +203,7 @@ def table_name(season, division):
      State('seasonlist', 'value')]
 )
 def show_league_tables(n_clicks, data, division, season):
-    """
 
-    :param n_clicks:
-    :param data:
-    :param division:
-    :param season:
-    :return:
-    """
     if n_clicks == 0:
         return [{}]
 
@@ -281,14 +220,7 @@ def show_league_tables(n_clicks, data, division, season):
      State('indi-teams', 'value')]
 )
 def goal_pct(n_clicks, data, team):
-    """
 
-    :param n_clicks:
-    :param data:
-    :param division:
-    :param team:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -332,14 +264,7 @@ def goal_pct(n_clicks, data, team):
      State('indi-teams', 'value')]
 )
 def shot_data(n_clicks, data, team):
-    """
 
-    :param data:
-    :param division:
-    :param team:
-    :param n_clicks:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -376,14 +301,6 @@ def shot_data(n_clicks, data, team):
      State('indi-teams', 'value')]
 )
 def show_foul_stats(n_clicks, data, team):
-    """
-
-    :param data:
-    :param division:
-    :param team:
-    :param n_clicks:
-    :return:
-    """
 
     if n_clicks == 0:
         return []
@@ -473,11 +390,7 @@ def store_overall_data(n_clicks):
      Input('league-tab', 'n_clicks')]
 )
 def show_overall_wins(data, n_clicks):
-    """
 
-    :param data:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -514,12 +427,7 @@ def show_overall_wins(data, n_clicks):
      Input('league-tab', 'n_clicks')]
 )
 def show_all_goals(data, n_clicks):
-    """
 
-    :param data:
-    :param n_clicks:
-    :return:
-    """
     if n_clicks == 0:
         return []
 
@@ -556,12 +464,6 @@ def show_all_goals(data, n_clicks):
      Input('league-tab', 'n_clicks')]
 )
 def show_avg_goals(data, n_clicks):
-    """
-
-    :param data:
-    :param n_clicks:
-    :return:
-    """
 
     if n_clicks == 0:
         return []
@@ -599,12 +501,6 @@ def show_avg_goals(data, n_clicks):
      Input('league-tab', 'n_clicks')]
 )
 def show_top_team(data, n_clicks):
-    """
-
-    :param data:
-    :param n_clicks:
-    :return:
-    """
 
     if n_clicks == 0:
         return []
@@ -632,32 +528,26 @@ def show_top_team(data, n_clicks):
     [Input('league-tab', 'n_clicks')]
 )
 def update_today(n_clicks):
-    """
 
-    :return:
-    """
     if n_clicks == 0:
         return []
 
-    df = Scraper.live_scores(Scraper.paths['today'])
-    df = change_data(df)
+    scraper = Scrape(page_url, today, yesterday, tomorrow, page_live)
+    df = scraper.soup('today', scraper.today())
+    df = scraper.change_data(df, 'today')
+    df = df[scraper.col_drop(df)]
 
     return df.to_dict(orient='records')
 
 @app.callback(
     Output('live', 'data'),
-    [Input('league-tab', 'n_clicks')]
+    [Input('interval', 'n_intervals')]
 )
-def update_live(n_clicks):
-    """
+def update_live(n):
 
-    :return:
-    """
-    if n_clicks == 0:
-        return []
-
-    df = Scraper.live_scores(Scraper.paths['live'])
-    df = change_data(df, live=True)
+    scraper = Scrape(page_url, today, yesterday, tomorrow, page_live)
+    df = scraper.soup('live', scraper.live_score())
+    df = scraper.change_data(df, 'live')
 
     return df.to_dict(orient='records')
 
@@ -666,15 +556,14 @@ def update_live(n_clicks):
     [Input('league-tab', 'n_clicks')]
 )
 def update_yesterday(n_clicks):
-    """
 
-    :return:
-    """
     if n_clicks == 0:
         return []
 
-    df = Scraper.live_scores(Scraper.paths['yesterday'])
-    df = change_data(df)
+    scraper = Scrape(page_url, today, yesterday, tomorrow, page_live)
+    df = scraper.soup('yesterday', scraper.yesterday())
+    df = scraper.change_data(df, 'yesterday')
+    df = df[scraper.col_drop(df)]
 
     return df.to_dict(orient='records')
 
@@ -683,15 +572,14 @@ def update_yesterday(n_clicks):
     [Input('league-tab', 'n_clicks')]
 )
 def update_tomorrow(n_clicks):
-    """
 
-    :return:
-    """
     if n_clicks == 0:
         return []
 
-    df = Scraper.live_scores(Scraper.paths['tomorrow'])
-    df = change_data(df)
+    scraper = Scrape(page_url, today, yesterday, tomorrow, page_live)
+    df = scraper.soup('tomorrow', scraper.tomorrow())
+    df = scraper.change_data(df, 'tomorrow')
+    df = df[scraper.col_drop(df)]
 
     return df.to_dict(orient='records')
 

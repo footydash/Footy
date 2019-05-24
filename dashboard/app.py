@@ -119,7 +119,7 @@ app.layout = html.Div([
                                             html.Div(
                                                 dash_table.DataTable(id='today', columns=[
                                                     {'name': 'Game Start', 'id': 'Game Start'},
-                                                    {'name': 'Division', 'id': 'Division'},
+                                                    {'name': 'Country', 'id': 'Country'},
                                                     {'name': 'Home Team', 'id': 'Home Team'},
                                                     {'name': 'Score', 'id': 'Score'},
                                                     {'name': 'Away Team', 'id': 'Away Team'},
@@ -139,7 +139,7 @@ app.layout = html.Div([
                                             html.Div(
                                                 dash_table.DataTable(id='live', columns=[
                                                     {'name': 'Game Start', 'id': 'Game Start'},
-                                                    {'name': 'Current Time', 'id': 'Current Time'},
+                                                    {'name': 'Country / Live Time', 'id': 'Country / Live Time'},
                                                     {'name': 'Home Team', 'id': 'Home Team'},
                                                     {'name': 'Score', 'id': 'Score'},
                                                     {'name': 'Away Team', 'id': 'Away Team'},
@@ -150,7 +150,12 @@ app.layout = html.Div([
                                                              'color': 'white',
                                                              'whiteSpace': 'no-wrap',
                                                              'maxWidth': 0, },
-                                                 ), className='col-xs-offset-1 col-xs-9')
+                                                 ), className='col-xs-offset-1 col-xs-9'),
+                                            dcc.Interval(
+                                                id='interval',
+                                                interval=5 * 1000,
+                                                n_intervals=0
+                                            ),
                                         ]),
                                 dcc.Tab(label='Yesterday', id='score-yesterday', style=tab_style,
                                         selected_style=tab_selected_style,
@@ -159,7 +164,7 @@ app.layout = html.Div([
                                             html.Div(
                                                 dash_table.DataTable(id='yesterday', columns=[
                                                     {'name': 'Game Start', 'id': 'Game Start'},
-                                                    {'name': 'Division', 'id': 'Division'},
+                                                    {'name': 'Country', 'id': 'Country'},
                                                     {'name': 'Home Team', 'id': 'Home Team'},
                                                     {'name': 'Score', 'id': 'Score'},
                                                     {'name': 'Away Team', 'id': 'Away Team'},
@@ -179,7 +184,7 @@ app.layout = html.Div([
                                             html.Div(
                                                 dash_table.DataTable(id='tomorrow', columns=[
                                                     {'name': 'Game Start', 'id': 'Game Start'},
-                                                    {'name': 'Division', 'id': 'Division'},
+                                                    {'name': 'Country', 'id': 'Country'},
                                                     {'name': 'Home Team', 'id': 'Home Team'},
                                                     {'name': 'Score', 'id': 'Score'},
                                                     {'name': 'Away Team', 'id': 'Away Team'},
